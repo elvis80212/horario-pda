@@ -227,6 +227,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <div class="hbtns">
       <button class="hbtn admin" id="btn-admin-panel" onclick="toggleAdmin()" style="display:none">👑 Admin</button>
+      <button class="hbtn" onclick="exportarReporte()" style="background:#f0fdf4;border-color:#86efac;color:#166534">📊 Reporte</button>
       <button class="hbtn" onclick="nuevoMes()">🔄 Nuevo mes</button>
       
       <div class="sync" id="sync"><div class="sdot"></div><span id="sync-txt">…</span></div>
@@ -302,6 +303,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <button class="m-no" onclick="cerrarModal()">Cancelar</button>
       <button class="m-ok" id="m-ok">Confirmar</button>
     </div>
+  </div>
+</div>
+
+<!-- REPORTE MODAL -->
+<div class="overlay" id="overlay-reporte" style="align-items:center">
+  <div class="modal" style="max-height:85vh;overflow-y:auto;border-radius:20px">
+    <h3>📊 Reporte de Turnos</h3>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button onclick="verTabla()" id="btn-ver-tabla" style="padding:8px 14px;border-radius:10px;border:1.5px solid #86efac;background:#dcfce7;color:#166534;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem">📋 Tabla</button>
+      <button onclick="verGrafico()" id="btn-ver-grafico" style="padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem">📈 Gráfico</button>
+      <button onclick="exportarExcel()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #93c5fd;background:#dbeafe;color:#1e40af;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem">⬇️ Excel</button>
+    </div>
+    <div id="reporte-contenido"></div>
+    <button class="m-no" style="width:100%;margin-top:14px" onclick="document.getElementById('overlay-reporte').classList.remove('open')">Cerrar</button>
   </div>
 </div>
 
@@ -930,6 +945,90 @@ function setSync(state){
 function show(id){ document.getElementById(id).classList.remove('hide'); }
 function hide(id){ document.getElementById(id).classList.add('hide'); }
 function mostrarLoad(txt){ document.getElementById('load-txt').textContent=txt; show('scr-load'); }
+
+function exportarReporte(){
+  document.getElementById('overlay-reporte').classList.add('open');
+  verTabla();
+}
+
+function verTabla(){
+  document.getElementById('btn-ver-tabla').style.background='#dcfce7';
+  document.getElementById('btn-ver-tabla').style.borderColor='#86efac';
+  document.getElementById('btn-ver-tabla').style.color='#166534';
+  document.getElementById('btn-ver-grafico').style.background='var(--bg)';
+  document.getElementById('btn-ver-grafico').style.borderColor='var(--border)';
+  document.getElementById('btn-ver-grafico').style.color='var(--muted)';
+
+  var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.76rem">'
+    +'<thead><tr style="background:var(--card2)">'
+    +'<th style="padding:8px;text-align:left;border:1px solid var(--border)">Usuario</th>'
+    +'<th style="padding:8px;border:1px solid var(--border)">Día</th>'
+    +'<th style="padding:8px;border:1px solid var(--border)">Fecha</th>'
+    +'<th style="padding:8px;border:1px solid var(--border)">Hora</th>'
+    +'</tr></thead><tbody>';
+
+  var filas=0;
+  diasKeys.forEach(function(dk){
+    if(!sched[dk])return;
+    for(var si=0;si<SLOTS.length;si++){
+      var uid=sched[dk][si];
+      if(uid&&users[uid]){
+        var u=users[uid];
+        var p=dk.split('-');
+        var d=new Date(+p[0],+p[1]-1,+p[2]);
+        html+='<tr style="background:'+getBg(uid)+'">'
+          +'<td style="padding:7px 8px;border:1px solid var(--border);font-weight:700;color:'+getTxt(uid)+'">'+u.nombre+'</td>'
+          +'<td style="padding:7px 8px;border:1px solid var(--border);text-align:center">'+DIAS[d.getDay()]+'</td>'
+          +'<td style="padding:7px 8px;border:1px solid var(--border);text-align:center">'+p[2]+'/'+p[1]+'</td>'
+          +'<td style="padding:7px 8px;border:1px solid var(--border);text-align:center">'+SLOTS[si]+'</td>'
+          +'</tr>';
+        filas++;
+      }
+    }
+  });
+
+  if(filas===0) html+='<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--muted)">No hay turnos asignados</td></tr>';
+  html+='</tbody></table></div>';
+  document.getElementById('reporte-contenido').innerHTML=html;
+}
+
+function verGrafico(){
+  document.getElementById('btn-ver-grafico').style.background='#dbeafe';
+  document.getElementById('btn-ver-grafico').style.borderColor='#93c5fd';
+  document.getElementById('btn-ver-grafico').style.color='#1e40af';
+  document.getElementById('btn-ver-tabla').style.background='var(--bg)';
+  document.getElementById('btn-ver-tabla').style.borderColor='var(--border)';
+  document.getElementById('btn-ver-tabla').style.color='var(--muted)';
+
+  // Contar turnos por usuario
+  var conteos={};
+  Object.keys(users).forEach(function(uid){ conteos[uid]=0; });
+  diasKeys.forEach(function(dk){
+    if(!sched[dk])return;
+    for(var si=0;si<SLOTS.length;si++){
+      var uid=sched[dk][si];
+      if(uid&&conteos[uid]!==undefined) conteos[uid]++;
+    }
+  });
+
+  var max=Math.max.apply(null,Object.values(conteos))||1;
+  var html='<div style="padding:8px 0">';
+  Object.keys(users).forEach(function(uid){
+    var u=users[uid], c=conteos[uid]||0;
+    var pct=Math.round(c/max*100);
+    html+='<div style="margin-bottom:14px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;margin-bottom:5px">'
+      +'<span style="color:'+getTxt(uid)+'">'+u.nombre+'</span>'
+      +'<span style="color:var(--muted)">'+c+' turno'+(c!==1?'s':'')+'  ('+c+'h)</span>'
+      +'</div>'
+      +'<div style="background:var(--border);border-radius:99px;height:22px;overflow:hidden">'
+      +'<div style="width:'+pct+'%;background:'+getTxt(uid)+';height:100%;border-radius:99px;display:flex;align-items:center;padding-left:8px;transition:width .5s">'
+      +(pct>15?'<span style="font-size:.7rem;color:#fff;font-weight:700">'+c+'h</span>':'')
+      +'</div></div></div>';
+  });
+  html+='</div>';
+  document.getElementById('reporte-contenido').innerHTML=html;
+}
 
 function toast(msg){
   var el=document.getElementById('toast');
