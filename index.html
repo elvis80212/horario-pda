@@ -171,7 +171,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <span class="field-label">Confirma tu PIN</span>
     <input class="inp" id="inp-pinconf" type="password" placeholder="••••" maxlength="8" inputmode="numeric"/>
     <button class="btn-main green" onclick="registrarme()">✅ REGISTRAR</button>
-    <div class="nota" id="reg-nota">⚠️ El registro solo está disponible el último día del mes.</div>
+
   </div>
 </div>
 
@@ -323,12 +323,7 @@ function generarDias(){
   }
 }
 
-function esUltimoDiaMes(){
-  var hoy = new Date();
-  var manana = new Date(hoy);
-  manana.setDate(hoy.getDate()+1);
-  return manana.getMonth() !== hoy.getMonth();
-}
+
 
 // ══════════════════════════════════════════
 //  INICIO
