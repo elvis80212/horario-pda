@@ -166,14 +166,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <!-- ═══ LOGIN ═══ -->
 <div class="screen" id="scr-login">
   <div class="box">
-    <h2>📱 HORARIO PDA</h2>
-    <p>Ingresa tu PIN de 2 dígitos para continuar.</p>
-    <span class="flabel">Tu PIN (2 dígitos)</span>
-    <input class="inp" id="inp-pin" type="password" placeholder="••" maxlength="2" inputmode="numeric"/>
-    <div class="err-msg" id="pin-err">❌ PIN incorrecto. Intenta de nuevo.</div>
-    <button class="btn-main" onclick="verificarPin()">🔓 ENTRAR</button>
-    <button class="btn-sec" onclick="irRegistro()">➕ Registrarse por primera vez</button>
-    <button class="btn-sec" style="margin-top:6px;color:#8b5cf6;border-color:#c4b5fd" onclick="show('scr-admin-login');hide('scr-login')">👑 Entrar como Admin</button>
+    <h2 id="login-titulo">📱 HORARIO PDA</h2>
+    <p id="login-desc">Ingresa tu PIN para continuar.</p>
+    <!-- Solo si ya registrado -->
+    <div id="div-pin">
+      <span class="flabel">Tu PIN (2 dígitos)</span>
+      <input class="inp" id="inp-pin" type="password" placeholder="••" maxlength="2" inputmode="numeric"/>
+      <div class="err-msg" id="pin-err">❌ PIN incorrecto. Intenta de nuevo.</div>
+      <button class="btn-main" onclick="verificarPin()">🔓 ENTRAR</button>
+    </div>
+    <!-- Solo si celular nuevo -->
+    <div id="div-reg" style="display:none">
+      <button class="btn-main green" onclick="irRegistro()">➕ REGISTRARSE</button>
+    </div>
+    <button class="btn-sec" style="margin-top:8px;color:#8b5cf6;border-color:#c4b5fd" onclick="show('scr-admin-login');hide('scr-login')">👑 Entrar como Admin</button>
   </div>
 </div>
 
@@ -222,7 +228,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="hbtns">
       <button class="hbtn admin" id="btn-admin-panel" onclick="toggleAdmin()" style="display:none">👑 Admin</button>
       <button class="hbtn" onclick="nuevoMes()">🔄 Nuevo mes</button>
-      <button class="hbtn" onclick="cerrarSesion()">🚪 Salir</button>
+      
       <div class="sync" id="sync"><div class="sdot"></div><span id="sync-txt">…</span></div>
     </div>
   </div>
@@ -398,12 +404,22 @@ window.onload = function(){
   hide('scr-load');
   var savedId = localStorage.getItem('pda-uid');
   if(savedId){
+    // Celular ya registrado — solo PIN, sin opción de cambiar
     me = savedId;
     miNombre = localStorage.getItem('pda-nombre')||'';
     miColor  = parseInt(localStorage.getItem('pda-color'))||0;
     show('scr-login');
+    document.getElementById('div-pin').style.display='block';
+    document.getElementById('div-reg').style.display='none';
+    document.getElementById('login-titulo').textContent = '👋 Hola, '+miNombre;
+    document.getElementById('login-desc').textContent = 'Ingresa tu PIN para continuar.';
   } else {
+    // Celular nuevo — solo registro
     show('scr-login');
+    document.getElementById('div-pin').style.display='none';
+    document.getElementById('div-reg').style.display='block';
+    document.getElementById('login-titulo').textContent = '📱 Nuevo dispositivo';
+    document.getElementById('login-desc').textContent = 'Este celular no tiene usuario. Regístrate para continuar.';
   }
 };
 
@@ -522,11 +538,16 @@ function registrarme(){
 function showErr(el, msg){ el.textContent=msg; el.style.display='block'; hide('scr-load'); }
 
 function cerrarSesion(){
-  me=null; miNombre=''; miColor=0; esAdmin=false;
-  localStorage.removeItem('pda-uid');
-  localStorage.removeItem('pda-nombre');
-  localStorage.removeItem('pda-color');
-  location.reload();
+  // Solo admin puede salir (su sesion no es permanente)
+  if(esAdmin){
+    esAdmin=false;
+    if(localStorage.getItem('pda-uid')){
+      // Volver a login normal
+      location.reload();
+    } else {
+      location.reload();
+    }
+  }
 }
 
 // ══════════════════════════════════════
