@@ -345,6 +345,17 @@ var sched    = {};
 var selec    = {};
 var diasKeys = [];
 var offsetSemana = 0;
+
+// ID único del dispositivo
+function getDeviceId(){
+  var did = localStorage.getItem('pda-device-id');
+  if(!did){
+    did = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
+    localStorage.setItem('pda-device-id', did);
+  }
+  return did;
+}
+var DEVICE_ID = getDeviceId();
 var adminPanelVisible = false;
 var usuariosPanelVisible = false;
 
@@ -451,12 +462,24 @@ function verificarPin(){
   db.ref('usuarios/'+me).once('value', function(snap){
     var u = snap.val();
     if(u && u.pin === pin){
+      // Verificar que es el mismo dispositivo
+      if(u.deviceId && u.deviceId !== DEVICE_ID){
+        hide('scr-load');
+        show('scr-login');
+        var errEl = document.getElementById('pin-err');
+        errEl.textContent = '⚠️ Este usuario está registrado en otro dispositivo. Contacta al Admin.';
+        errEl.style.display='block';
+        document.getElementById('inp-pin').value='';
+        return;
+      }
       esAdmin = u.esAdmin || false;
       conectarFirebase();
     } else {
       hide('scr-load');
       show('scr-login');
-      document.getElementById('pin-err').style.display='block';
+      var errEl = document.getElementById('pin-err');
+      errEl.textContent = '❌ PIN incorrecto. Intenta de nuevo.';
+      errEl.style.display='block';
       document.getElementById('inp-pin').value='';
     }
   });
@@ -496,6 +519,15 @@ function registrarme(){
   db.ref('usuarios').once('value', function(snap){
     var ud = snap.val() || {};
 
+    // Verificar nombre único
+    var nombreUsado = Object.values(ud).some(function(u){ return u.nombre.toLowerCase() === nombre.toLowerCase(); });
+    if(nombreUsado){
+      hide('scr-load');
+      show('scr-reg');
+      showErr(errEl,'⚠️ Ese nombre ya está registrado. Usa otro.');
+      return;
+    }
+
     // Verificar PIN único
     var pinUsado = Object.values(ud).some(function(u){ return u.pin === pin; });
     if(pinUsado){
@@ -527,9 +559,13 @@ function registrarme(){
       nombre: nombre,
       color:  color,
       pin:    pin,
-      esAdmin:esFirstAdmin
+      esAdmin:esFirstAdmin,
+      deviceId: DEVICE_ID
     }, function(err){
       if(err){ hide('scr-load'); show('scr-reg'); showErr(errEl,'❌ Error al registrar'); return; }
+      // Entrar directo a la app
+      hide('scr-reg');
+      mostrarLoad('Entrando…');
       conectarFirebase();
     });
   });
@@ -770,6 +806,17 @@ function renderUsersList(){
       +(uid!==me?'<button class="btn-del" onclick="eliminarUsuario(\''+uid+'\',\''+u.nombre+'\')">🗑️ Eliminar</button>':'<span style="font-size:.72rem;color:var(--muted)">(tú)</span>');
     list.appendChild(item);
   });
+}
+
+function resetDispositivo(uid, nombre){
+  abrirModal('📱 Reset dispositivo',
+    'Esto permite que <strong>'+nombre+'</strong> entre desde un celular diferente.<br><br>¿Confirmas?',
+    '#f59e0b','Sí, resetear',
+    function(){
+      db.ref('usuarios/'+uid+'/deviceId').set(null, function(){
+        toast('✅ Dispositivo reseteado — '+nombre+' puede entrar desde otro cel');
+      });
+    });
 }
 
 function eliminarUsuario(uid, nombre){
