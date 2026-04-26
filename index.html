@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<!-- SheetJS para Excel -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -20,7 +19,7 @@
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
 /* ── PANTALLAS ── */
-.screen{position:fixed;inset:0;background:rgba(240,244,248,.97);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.screen{position:fixed;inset:0;background:rgba(240,244,248,.97);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
 .screen.hide{display:none;}
 .box{background:var(--card);border:1.5px solid var(--border);border-radius:24px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.1);}
 .box h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:6px;color:var(--text);}
@@ -75,14 +74,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* ── USUARIOS LIST ── */
 .users-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
-.user-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:.84rem;}
+.user-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:.84rem;flex-wrap:wrap;gap:6px;}
 .user-item-left{display:flex;align-items:center;gap:10px;font-weight:600;}
 .user-dot{width:10px;height:10px;border-radius:50%;}
 .user-badge{font-size:.65rem;padding:2px 7px;border-radius:6px;font-weight:700;}
 .badge-admin{background:#f5f3ff;color:var(--purple);border:1px solid #c4b5fd;}
 .badge-user{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;}
+.user-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
 .btn-del{padding:5px 10px;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .btn-del:hover{background:#fee2e2;}
+.btn-rename{padding:5px 10px;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-rename:hover{background:#bfdbfe;}
+.rename-row{display:flex;gap:6px;margin-top:6px;width:100%;}
+.rename-inp{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;background:var(--bg);outline:none;color:var(--text);}
+.rename-inp:focus{border-color:var(--accent);}
+.btn-rename-ok{padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-rename-cancel{padding:7px 12px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* ── ONLINE ── */
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;display:inline-block;flex-shrink:0;}
 
 /* ── MI INFO ── */
 .mi-info{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);margin-bottom:14px;font-size:.84rem;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.04);}
@@ -105,10 +115,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .t-time{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);display:flex;align-items:center;white-space:nowrap;}
 .cell{padding:2px!important;}
 .cbtn{width:100%;height:42px;border-radius:7px;border:1.5px solid transparent;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .12s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;}
-.c-free{background:#dcfce7;color:#166534;border-color:#86efac;}
+.c-free{background:#f1f5f9;color:#94a3b8;border-color:#cbd5e1;}
 .c-free:active{transform:scale(.92);}
-.c-sel{background:#dbeafe;color:#1e40af;border-color:#60a5fa;animation:pop .2s ease;}
-.c-sel-lib{background:#fef9c3;color:#713f12;border-color:#fde047;animation:pop .2s ease;}
+.c-sel{background:#2563eb;color:#fff;border-color:#1d4ed8;animation:pop .2s ease;}
+.c-sel-lib{background:#f59e0b;color:#fff;border-color:#d97706;animation:pop .2s ease;}
 @keyframes pop{0%{transform:scale(.88)}70%{transform:scale(1.06)}100%{transform:scale(1)}}
 .c-mine{font-weight:700;}
 .c-other{cursor:default;font-size:.63rem;pointer-events:none;font-weight:600;}
@@ -117,8 +127,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ── MODO TABS ── */
 .modo-tabs{display:flex;gap:8px;margin-bottom:12px;}
 .modo-tab{flex:1;padding:10px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;}
-.modo-tab.activo.reservar{background:#dcfce7;border-color:#86efac;color:#166534;}
-.modo-tab.activo.liberar{background:#fef2f2;border-color:#fca5a5;color:#991b1b;}
+.modo-tab.activo.reservar{background:#16a34a;border-color:#15803d;color:#fff;}
+.modo-tab.activo.liberar{background:#ef4444;border-color:#dc2626;color:#fff;}
 
 /* ── BARRA FLOTANTE ── */
 .finbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1.5px solid var(--border);padding:12px 18px;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:10px;transform:translateY(100%);transition:transform .3s;box-shadow:0 -4px 20px rgba(0,0,0,.1);}
@@ -159,27 +169,125 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--text);color:#fff;padding:11px 22px;border-radius:12px;font-size:.84rem;font-weight:600;opacity:0;transition:all .25s;pointer-events:none;z-index:600;box-shadow:0 4px 20px rgba(0,0,0,.2);white-space:nowrap;}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
 .tip{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 13px;font-size:.76rem;color:#1e40af;margin-bottom:12px;line-height:1.6;}
+
+/* ── LOGIN SCREEN ── */
+.login-wrap{max-width:460px;width:100%;padding-top:10px;}
+.login-preview-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.login-preview-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text);margin-bottom:8px;}
+.login-online-card{background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:10px 14px;margin-bottom:12px;}
+.login-online-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--green);margin-bottom:6px;}
+.login-header{text-align:center;margin-bottom:14px;padding:16px 0 4px;}
+.login-header h1{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;color:var(--text);}
+.login-header p{color:var(--muted);font-size:.82rem;margin-top:4px;}
+
+/* ── REPORTE PIVOT ── */
+.reporte-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.rep-tab{padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;transition:all .2s;}
+.rep-tab.activo-tabla{background:#dcfce7;border-color:#86efac;color:#166534;}
+.rep-tab.activo-grafico{background:#dbeafe;border-color:#93c5fd;color:#1e40af;}
+.rep-tab.activo-matriz{background:#f5f3ff;border-color:#c4b5fd;color:#4c1d95;}
+.matriz-wrap{overflow-x:auto;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);}
+.slider-wrap{padding:4px 2px;}
+.slider-wrap input[type=range]{width:100%;accent-color:var(--purple);height:4px;cursor:pointer;}
+
+/* ── COUNTDOWN TIMER ── */
+.timer-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:9px 14px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);flex-wrap:wrap;}
+.timer-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);white-space:nowrap;}
+.timer-label.urgente{color:var(--red);}
+.timer-digits{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.timer-block{display:flex;flex-direction:column;align-items:center;background:var(--accent);color:#fff;border-radius:8px;padding:4px 8px;min-width:36px;}
+.timer-block.urgente{background:var(--red);}
+.timer-n{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;line-height:1;}
+.timer-u{font-size:.48rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.85;margin-top:1px;}
+.timer-sep{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--muted);}
+.timer-event{font-size:.75rem;font-weight:600;color:var(--text);white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.timer-pasado{font-size:.78rem;color:var(--green);font-weight:700;}
+.btn-timer-admin{background:#f5f3ff;border:1.5px solid #c4b5fd;color:var(--purple);cursor:pointer;font-size:.7rem;font-weight:700;padding:4px 9px;border-radius:8px;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.btn-timer-admin:hover{background:#ede9fe;}
+
+/* ── ADMIN FECHA MODAL ── */
+.fecha-modal{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:22px;width:100%;max-width:340px;animation:slideUp .25s ease;}
+.fecha-modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--purple);margin-bottom:14px;}
+.inp-fecha{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;margin-bottom:10px;}
+.inp-fecha:focus{border-color:var(--accent);}
+.inp-evento{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;margin-bottom:14px;}
+.inp-evento:focus{border-color:var(--accent);}
+
+/* ── CHAT FLOTANTE ── */
+.chat-fab{position:fixed;bottom:22px;right:20px;width:54px;height:54px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:1.4rem;cursor:pointer;z-index:500;box-shadow:0 4px 16px rgba(59,130,246,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+.chat-fab:active{transform:scale(.9);}
+.chat-badge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;display:none;}
+.chat-win{position:fixed;bottom:86px;right:14px;width:320px;max-width:calc(100vw - 28px);height:420px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:499;display:flex;flex-direction:column;animation:slideUp .2s ease;overflow:hidden;}
+.chat-win.hide{display:none;}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--accent);color:#fff;border-radius:20px 20px 0 0;}
+.chat-header-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
+.chat-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.chat-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--bg);}
+.chat-msg{max-width:85%;padding:7px 10px;border-radius:12px;font-size:.78rem;line-height:1.4;}
+.chat-msg.mio{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.chat-msg.otro{align-self:flex-start;background:var(--card);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
+.chat-msg-nombre{font-size:.62rem;font-weight:700;opacity:.8;margin-bottom:2px;}
+.chat-msg-hora{font-size:.58rem;opacity:.65;margin-top:2px;text-align:right;}
+.chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:var(--card);}
+.chat-inp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--text);outline:none;}
+.chat-inp:focus{border-color:var(--accent);}
+.chat-send{background:var(--accent);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-send:active{transform:scale(.9);}
 </style>
 </head>
 <body>
 
 <!-- ═══ LOGIN ═══ -->
 <div class="screen" id="scr-login">
-  <div class="box">
-    <h2 id="login-titulo">📱 HORARIO PDA</h2>
-    <p id="login-desc">Ingresa tu PIN para continuar.</p>
-    <!-- Solo si ya registrado -->
-    <div id="div-pin">
+  <div class="login-wrap">
+    <div class="login-header">
+      <h1>📱 HORARIO PDA</h1>
+      <p>Inventario · tiempo real</p>
+    </div>
+
+    <!-- Timer cuenta regresiva (público) -->
+    <div class="login-preview-card" id="login-timer-card" style="padding:10px 14px">
+      <div class="login-preview-title" style="margin-bottom:6px">⏱ Próximo evento</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span id="login-timer-event" style="font-size:.78rem;font-weight:600;color:var(--text)">Cargando…</span>
+        <div class="timer-digits" id="login-timer-digits"></div>
+      </div>
+    </div>
+
+    <!-- Preview del horario (público) -->
+    <div class="login-preview-card">
+      <div class="login-preview-title">📅 Horario de esta semana</div>
+      <div id="login-preview-wrap" style="overflow-x:auto">
+        <div style="text-align:center;padding:18px;color:var(--muted);font-size:.8rem">Cargando horario…</div>
+      </div>
+      <div id="login-slider-wrap" class="slider-wrap" style="display:none">
+        <input type="range" id="login-prev-slider" min="0" max="100" value="0" oninput="scrollLoginPreview(this.value)">
+      </div>
+    </div>
+
+    <!-- Usuarios en línea (público) -->
+    <div class="login-online-card" id="login-online-card" style="display:none">
+      <div class="login-online-title">🟢 En línea ahora</div>
+      <div id="login-online-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+
+    <!-- PIN (dispositivo ya registrado) -->
+    <div id="div-pin" class="box" style="display:none">
+      <h2 id="login-titulo">👋 Hola</h2>
+      <p id="login-desc">Ingresa tu PIN para continuar.</p>
       <span class="flabel">Tu PIN (2 dígitos)</span>
       <input class="inp" id="inp-pin" type="password" placeholder="••" maxlength="2" inputmode="numeric"/>
       <div class="err-msg" id="pin-err">❌ PIN incorrecto. Intenta de nuevo.</div>
       <button class="btn-main" onclick="verificarPin()">🔓 ENTRAR</button>
     </div>
-    <!-- Solo si celular nuevo -->
-    <div id="div-reg" style="display:none">
-      <button class="btn-main green" onclick="irRegistro()">➕ REGISTRARSE</button>
+
+    <!-- Registro (dispositivo nuevo) -->
+    <div id="div-reg" class="box" style="display:none">
+      <h2>📱 Nuevo dispositivo</h2>
+      <p>Este celular no tiene usuario asignado.</p>
+      <button class="btn-main green" onclick="irRegistro()">👤 REGISTRARSE COMO USUARIO</button>
+      <button class="btn-sec" style="margin-top:8px;color:#8b5cf6;border-color:#c4b5fd" onclick="show('scr-admin-login');hide('scr-login')">👑 Entrar como Admin</button>
     </div>
-    <button class="btn-sec" style="margin-top:8px;color:#8b5cf6;border-color:#c4b5fd" onclick="show('scr-admin-login');hide('scr-login')">👑 Entrar como Admin</button>
   </div>
 </div>
 
@@ -187,11 +295,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div class="screen hide" id="scr-admin-login">
   <div class="box">
     <h2>👑 ADMIN</h2>
-    <p>Ingresa la contraseña de admin.</p>
+    <p>Ingresa la contraseña de administrador.</p>
     <span class="flabel">Contraseña</span>
     <input class="inp" id="inp-admin-pass" type="password" placeholder="••••••"/>
     <div class="err-msg" id="admin-err">❌ Contraseña incorrecta.</div>
-    <button class="btn-main purple" onclick="verificarAdmin()">👑 ENTRAR</button>
+    <button class="btn-main purple" onclick="verificarAdmin()">👑 ENTRAR COMO ADMIN</button>
     <button class="btn-sec" onclick="show('scr-login');hide('scr-admin-login')">← Volver</button>
   </div>
 </div>
@@ -229,7 +337,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <button class="hbtn admin" id="btn-admin-panel" onclick="toggleAdmin()" style="display:none">👑 Admin</button>
       <button class="hbtn" onclick="exportarReporte()" style="background:#f0fdf4;border-color:#86efac;color:#166534">📊 Reporte</button>
       <button class="hbtn" onclick="nuevoMes()">🔄 Nuevo mes</button>
-      
       <div class="sync" id="sync"><div class="sdot"></div><span id="sync-txt">…</span></div>
     </div>
   </div>
@@ -239,11 +346,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="admin-title">👑 Panel Supervisor</div>
     <div class="admin-btns">
       <button class="abtn green" onclick="exportarExcel()">📊 Exportar Excel</button>
-      <button class="abtn red" onclick="borrarTodosHorarios()">🗑️ Borrar todos los horarios</button>
+      <button class="abtn red" onclick="borrarTodosHorarios()">🗑️ Borrar horarios</button>
       <button class="abtn yellow" onclick="nuevoMes()">🔄 Nuevo mes</button>
       <button class="abtn purple" onclick="toggleUsuarios()">👥 Gestionar usuarios</button>
     </div>
-    <!-- LISTA USUARIOS -->
     <div id="panel-usuarios" style="display:none">
       <div class="users-list" id="users-list"></div>
       <button class="abtn green" style="margin-top:10px;width:100%" onclick="show('scr-reg');hide('scr-load')">➕ Crear nuevo usuario</button>
@@ -255,9 +361,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="mi-dot" id="mi-dot"></div>
     <span id="mi-nombre-txt"></span>
     <span style="color:var(--muted);font-size:.72rem;margin-left:4px" id="mi-rol-txt"></span>
+    <button id="btn-cambiar-pin" onclick="abrirCambiarPin()"
+      style="margin-left:auto;padding:4px 10px;background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;border-radius:8px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">
+      🔑 Cambiar PIN
+    </button>
+  </div>
+
+  <!-- COUNTDOWN TIMER -->
+  <div class="timer-bar" id="timer-bar" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+      <span id="timer-event-txt" class="timer-event">Próximo inventario</span>
+      <button class="btn-timer-admin" id="btn-timer-admin" onclick="abrirFechaModal()" style="display:none">⚙ Configurar</button>
+      <button id="btn-abrir-evento" onclick="toggleEvento()" style="display:none;padding:4px 12px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s"></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="timer-digits" id="timer-digits"></div>
+      <span id="evento-estado-txt" style="font-size:.7rem;font-weight:700;display:none"></span>
+    </div>
   </div>
 
   <div class="tip">💡 Elige modo → toca los turnos → confirma todos juntos.</div>
+
+  <!-- EN LÍNEA -->
+  <div id="online-section" style="margin-bottom:14px"></div>
 
   <!-- MODO TABS -->
   <div class="modo-tabs">
@@ -308,17 +434,70 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <!-- REPORTE MODAL -->
 <div class="overlay" id="overlay-reporte" style="align-items:center">
-  <div class="modal" style="max-height:85vh;overflow-y:auto;border-radius:20px">
+  <div class="modal" style="max-height:90vh;overflow-y:auto;border-radius:20px">
     <h3>📊 Reporte de Turnos</h3>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button onclick="verTabla()" id="btn-ver-tabla" style="padding:8px 14px;border-radius:10px;border:1.5px solid #86efac;background:#dcfce7;color:#166534;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem">📋 Tabla</button>
-      <button onclick="verGrafico()" id="btn-ver-grafico" style="padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem">📈 Gráfico</button>
-      <button onclick="exportarExcel()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #93c5fd;background:#dbeafe;color:#1e40af;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem">⬇️ Excel</button>
+    <div class="reporte-tabs">
+      <button class="rep-tab" id="rep-tab-tabla" onclick="verTabla()">📋 Lista</button>
+      <button class="rep-tab" id="rep-tab-matriz" onclick="verMatriz()">🗓️ Matriz</button>
+      <button class="rep-tab" id="rep-tab-grafico" onclick="verGrafico()">📈 Gráfico</button>
+      <button class="rep-tab" onclick="exportarExcel()" style="background:#dbeafe;border-color:#93c5fd;color:#1e40af">⬇️ Excel</button>
     </div>
     <div id="reporte-contenido"></div>
     <button class="m-no" style="width:100%;margin-top:14px" onclick="document.getElementById('overlay-reporte').classList.remove('open')">Cerrar</button>
   </div>
 </div>
+
+<!-- MODAL CAMBIAR PIN -->
+<div class="overlay" id="overlay-pin" style="align-items:center">
+  <div class="modal" style="border-radius:20px;max-width:320px">
+    <h3>🔑 Cambiar PIN</h3>
+    <p>Ingresa tu PIN actual y elige uno nuevo de 2 dígitos.</p>
+    <span class="flabel">PIN actual</span>
+    <input class="inp" id="pin-actual" type="password" placeholder="••" maxlength="2" inputmode="numeric"/>
+    <span class="flabel">PIN nuevo</span>
+    <input class="inp" id="pin-nuevo" type="password" placeholder="••" maxlength="2" inputmode="numeric"/>
+    <span class="flabel">Confirmar PIN nuevo</span>
+    <input class="inp" id="pin-confirmar" type="password" placeholder="••" maxlength="2" inputmode="numeric"/>
+    <div class="err-msg" id="pin-change-err"></div>
+    <div class="modal-btns" style="margin-top:4px">
+      <button class="m-no" onclick="cerrarCambiarPin()">Cancelar</button>
+      <button class="m-ok" style="background:var(--accent)" onclick="confirmarCambiarPin()">✓ Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FECHA INVENTARIO (solo admin) -->
+<div class="overlay" id="overlay-fecha" style="align-items:center">
+  <div class="fecha-modal">
+    <h3>⏱ Fecha del Inventario</h3>
+    <label class="flabel">Nombre del evento</label>
+    <input class="inp-evento" id="inp-evento" placeholder="Ej: Inventario Mayo" maxlength="30"/>
+    <label class="flabel">Fecha y hora</label>
+    <input class="inp-fecha" id="inp-fecha" type="datetime-local"/>
+    <div class="modal-btns" style="margin-top:4px">
+      <button class="m-no" onclick="document.getElementById('overlay-fecha').classList.remove('open')">Cancelar</button>
+      <button class="m-ok" style="background:var(--purple)" onclick="guardarFechaInventario()">✓ Guardar</button>
+    </div>
+    <button style="margin-top:10px;width:100%;padding:10px;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="borrarFechaInventario()">🗑️ Quitar cuenta regresiva</button>
+  </div>
+</div>
+
+<!-- CHAT FLOTANTE -->
+<div class="chat-win hide" id="chat-win">
+  <div class="chat-header">
+    <span class="chat-header-title">💬 EQUIPO</span>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="chat-input-row">
+    <input class="chat-inp" id="chat-inp" placeholder="Escribe un mensaje…" maxlength="200" onkeydown="if(event.key==='Enter')enviarMensaje()"/>
+    <button class="chat-send" onclick="enviarMensaje()">➤</button>
+  </div>
+</div>
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()" style="display:none">
+  💬
+  <span class="chat-badge" id="chat-badge">0</span>
+</button>
 
 <div class="toast" id="toast"></div>
 
@@ -338,6 +517,18 @@ var ADMIN_PASS  = 'admin';
 var COLORS_BG   = ['#fee2e2','#dbeafe','#d1fae5','#fef9c3','#ede9fe','#ffedd5','#cffafe','#fce7f3','#f0fdf4','#fff7ed'];
 var COLORS_TEXT = ['#991b1b','#1e40af','#065f46','#713f12','#4c1d95','#7c2d12','#164e63','#831843','#14532d','#431407'];
 var COLORS_BDR  = ['#fca5a5','#93c5fd','#6ee7b7','#fde047','#c4b5fd','#fb923c','#67e8f9','#f9a8d4','#86efac','#fdba74'];
+var COLORS_SEL  = [
+  {bg:'#ef4444',bdr:'#dc2626'},
+  {bg:'#3b82f6',bdr:'#2563eb'},
+  {bg:'#10b981',bdr:'#059669'},
+  {bg:'#f59e0b',bdr:'#d97706'},
+  {bg:'#8b5cf6',bdr:'#7c3aed'},
+  {bg:'#f97316',bdr:'#ea580c'},
+  {bg:'#06b6d4',bdr:'#0891b2'},
+  {bg:'#ec4899',bdr:'#db2777'},
+  {bg:'#22c55e',bdr:'#16a34a'},
+  {bg:'#f43f5e',bdr:'#e11d48'}
+];
 
 var SLOTS = [];
 for(var h=7;h<21;h++){
@@ -360,8 +551,11 @@ var sched    = {};
 var selec    = {};
 var diasKeys = [];
 var offsetSemana = 0;
+var presencia = {};
+var adminPanelVisible = false;
+var usuariosPanelVisible = false;
+var renombrando = null;
 
-// ID único del dispositivo
 function getDeviceId(){
   var did = localStorage.getItem('pda-device-id');
   if(!did){
@@ -371,8 +565,6 @@ function getDeviceId(){
   return did;
 }
 var DEVICE_ID = getDeviceId();
-var adminPanelVisible = false;
-var usuariosPanelVisible = false;
 
 // ══════════════════════════════════════
 //  FECHAS
@@ -392,7 +584,6 @@ function generarDias(){
     var d=new Date(hoy); d.setDate(hoy.getDate()+i);
     diasKeys.push(getFechaStr(d));
   }
-  // Update label
   var lbl = document.getElementById('semana-label');
   if(lbl){
     var p1=diasKeys[0].split('-'), p2=diasKeys[6].split('-');
@@ -401,19 +592,8 @@ function generarDias(){
   }
 }
 
-function semanaAnterior(){
-  offsetSemana--;
-  generarDias();
-  renderTabla();
-  renderSummary();
-}
-
-function semanaSiguiente(){
-  offsetSemana++;
-  generarDias();
-  renderTabla();
-  renderSummary();
-}
+function semanaAnterior(){ offsetSemana--; generarDias(); renderTabla(); renderSummary(); }
+function semanaSiguiente(){ offsetSemana++; generarDias(); renderTabla(); renderSummary(); }
 
 // ══════════════════════════════════════
 //  COLORES
@@ -421,33 +601,185 @@ function semanaSiguiente(){
 function getBg(uid)  { var c=users[uid]?users[uid].color%COLORS_BG.length:0;   return COLORS_BG[c];   }
 function getTxt(uid) { var c=users[uid]?users[uid].color%COLORS_TEXT.length:0; return COLORS_TEXT[c]; }
 function getBdr(uid) { var c=users[uid]?users[uid].color%COLORS_BDR.length:0;  return COLORS_BDR[c];  }
+function getSelColor(uid){ var c=users[uid]?users[uid].color%COLORS_SEL.length:0; return COLORS_SEL[c]; }
 
 // ══════════════════════════════════════
-//  INICIO
+//  INICIO — carga preview antes de login
 // ══════════════════════════════════════
 window.onload = function(){
   generarDias();
   hide('scr-load');
+
+  // Cargar preview público del horario
+  cargarPreviewLogin();
+  iniciarLoginTimer();
+
+  // Escuchar presencia para la pantalla de inicio
+  db.ref('presencia').on('value', function(snap){
+    presencia = snap.val() || {};
+    renderOnline();
+    renderLoginOnline();
+  });
+
   var savedId = localStorage.getItem('pda-uid');
   if(savedId){
-    // Celular ya registrado — solo PIN, sin opción de cambiar
+    // Dispositivo ya registrado — solo PIN, sin botón admin
     me = savedId;
     miNombre = localStorage.getItem('pda-nombre')||'';
     miColor  = parseInt(localStorage.getItem('pda-color'))||0;
     show('scr-login');
     document.getElementById('div-pin').style.display='block';
     document.getElementById('div-reg').style.display='none';
-    document.getElementById('login-titulo').textContent = '👋 Hola, '+miNombre;
+    document.getElementById('login-titulo').innerHTML = '<span onclick="show(\'scr-admin-login\');hide(\'scr-login\')" style="cursor:pointer" title="">👋</span> Hola, '+miNombre;
     document.getElementById('login-desc').textContent = 'Ingresa tu PIN para continuar.';
+    // El admin accede desde su propio celular con su PIN — no se muestra botón admin aquí
   } else {
-    // Celular nuevo — solo registro
+    // Dispositivo nuevo — registro o admin
     show('scr-login');
     document.getElementById('div-pin').style.display='none';
     document.getElementById('div-reg').style.display='block';
-    document.getElementById('login-titulo').textContent = '📱 Nuevo dispositivo';
-    document.getElementById('login-desc').textContent = 'Este celular no tiene usuario. Regístrate para continuar.';
   }
 };
+
+// ══════════════════════════════════════
+//  PREVIEW LOGIN (horario público)
+// ══════════════════════════════════════
+var loginTimerInterval = null;
+
+function iniciarLoginTimer(){
+  db.ref('config/fechaInventario').on('value', function(snap){
+    var data = snap.val();
+    var eventEl  = document.getElementById('login-timer-event');
+    var digitEl  = document.getElementById('login-timer-digits');
+    if(!eventEl || !digitEl) return;
+
+    if(loginTimerInterval) clearInterval(loginTimerInterval);
+
+    if(data && data.fecha){
+      eventEl.textContent = data.nombre || 'Próximo inventario';
+      var target = new Date(data.fecha);
+      loginTimerInterval = setInterval(function(){
+        var diff = target - new Date();
+        if(diff <= 0){
+          digitEl.innerHTML = '<span class="timer-pasado">✅ ¡Hoy es el día!</span>';
+          clearInterval(loginTimerInterval);
+          return;
+        }
+        var dias  = Math.floor(diff / 86400000);
+        var horas = Math.floor((diff % 86400000) / 3600000);
+        var mins  = Math.floor((diff % 3600000)  / 60000);
+        var segs  = Math.floor((diff % 60000)    / 1000);
+        var urgente = dias < 2;
+        var cls = urgente ? ' urgente' : '';
+        function blk(n,u){ return '<div class="timer-block'+cls+'"><span class="timer-n">'+String(n).padStart(2,'0')+'</span><span class="timer-u">'+u+'</span></div>'; }
+        var h = '';
+        if(dias > 0) h += blk(dias,'días') + '<span class="timer-sep">:</span>';
+        h += blk(horas,'hrs') + '<span class="timer-sep">:</span>';
+        h += blk(mins,'min') + '<span class="timer-sep">:</span>';
+        h += blk(segs,'seg');
+        digitEl.innerHTML = h;
+        eventEl.className = 'timer-event' + cls;
+      }, 1000);
+    } else {
+      eventEl.textContent = 'Sin fecha configurada';
+      digitEl.innerHTML = '<span style="font-size:.72rem;color:var(--muted)">— — : — —</span>';
+    }
+  });
+}
+
+function cargarPreviewLogin(){
+  Promise.all([
+    db.ref('usuarios').once('value'),
+    db.ref('horario').once('value')
+  ]).then(function(snaps){
+    var pu = snaps[0].val() || {};
+    var ps = snaps[1].val() || {};
+    renderLoginPreview(pu, ps);
+  }).catch(function(){
+    document.getElementById('login-preview-wrap').innerHTML =
+      '<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem">—</div>';
+  });
+}
+
+function renderLoginPreview(pu, ps){
+  var wrap = document.getElementById('login-preview-wrap');
+  if(!wrap) return;
+
+  var previewDias = [];
+  var hoy = new Date();
+  for(var i=0;i<7;i++){
+    var d=new Date(hoy); d.setDate(hoy.getDate()+i);
+    previewDias.push(getFechaStr(d));
+  }
+
+  var html = '<table id="prev-table" style="border-collapse:collapse;font-size:.6rem;min-width:100%">'
+    + '<thead><tr>'
+    + '<th style="padding:4px 6px;background:var(--card2);border:1px solid var(--border);white-space:nowrap;font-size:.55rem;color:var(--muted)">Hora</th>';
+
+  previewDias.forEach(function(dk){
+    html += '<th style="padding:3px 5px;background:var(--card2);border:1px solid var(--border);text-align:center;min-width:42px;font-size:.58rem">' + getDayLabel(dk) + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  SLOTS.forEach(function(slot, si){
+    html += '<tr><td style="padding:3px 6px;border:1px solid var(--border);font-family:DM Mono,monospace;font-size:.52rem;color:var(--text);font-weight:600;white-space:nowrap">' + slot + '</td>';
+    previewDias.forEach(function(dk){
+      var uid = ps[dk] && ps[dk][si] !== undefined ? ps[dk][si] : null;
+      if(uid && pu[uid]){
+        var c = pu[uid].color % COLORS_BG.length;
+        html += '<td style="padding:2px;border:1px solid var(--border);text-align:center">'
+          + '<div style="background:'+COLORS_BG[c]+';color:'+COLORS_TEXT[c]+';border-radius:4px;padding:2px 3px;font-weight:700;font-size:.6rem;white-space:nowrap">'
+          + pu[uid].nombre.substring(0,5)
+          + '</div></td>';
+      } else {
+        html += '<td style="border:1px solid var(--border)"></td>';
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+
+  wrap.innerHTML = html;
+
+  // Activar slider si la tabla desborda
+  setTimeout(function(){
+    var tbl = document.getElementById('prev-table');
+    if(tbl && tbl.scrollWidth > wrap.clientWidth){
+      var sw = document.getElementById('login-slider-wrap');
+      var sl = document.getElementById('login-prev-slider');
+      if(sw && sl){
+        sw.style.display = 'block';
+        sl.max = wrap.scrollWidth - wrap.clientWidth;
+        wrap.addEventListener('scroll', function(){ sl.value = wrap.scrollLeft; });
+      }
+    }
+  }, 100);
+}
+
+function scrollLoginPreview(val){
+  var wrap = document.getElementById('login-preview-wrap');
+  if(wrap) wrap.scrollLeft = parseInt(val);
+}
+
+function renderLoginOnline(){
+  var keys = Object.keys(presencia);
+  var card = document.getElementById('login-online-card');
+  var list = document.getElementById('login-online-list');
+  if(!card || !list) return;
+  if(keys.length === 0){ card.style.display='none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = '';
+  keys.forEach(function(uid){
+    var p = presencia[uid];
+    var c = (p.color||0) % COLORS_BG.length;
+    var chip = document.createElement('div');
+    chip.className = 'eq-chip';
+    chip.style.background = COLORS_BG[c];
+    chip.style.borderColor = COLORS_BDR[c];
+    chip.innerHTML = '<span class="online-dot"></span><span style="color:'+COLORS_TEXT[c]+'">'+(p.nombre||'?')+'</span>';
+    list.appendChild(chip);
+  });
+}
 
 function irRegistro(){
   hide('scr-login');
@@ -461,14 +793,6 @@ function irRegistro(){
 function verificarPin(){
   var pin = document.getElementById('inp-pin').value.trim();
   if(!pin){ toast('⚠️ Ingresa tu PIN'); return; }
-
-  // Verificar si es admin
-  if(pin === ADMIN_PASS){
-    hide('scr-login');
-    show('scr-admin-login');
-    return;
-  }
-
   if(!me){ toast('⚠️ Regístrate primero'); return; }
 
   mostrarLoad('Verificando…');
@@ -477,17 +801,18 @@ function verificarPin(){
   db.ref('usuarios/'+me).once('value', function(snap){
     var u = snap.val();
     if(u && u.pin === pin){
-      // Verificar que es el mismo dispositivo
       if(u.deviceId && u.deviceId !== DEVICE_ID){
         hide('scr-load');
         show('scr-login');
         var errEl = document.getElementById('pin-err');
-        errEl.textContent = '⚠️ Este usuario está registrado en otro dispositivo. Contacta al Admin.';
+        errEl.textContent = '⚠️ Este usuario está en otro dispositivo. Contacta al Admin.';
         errEl.style.display='block';
         document.getElementById('inp-pin').value='';
         return;
       }
-      esAdmin = u.esAdmin || false;
+      esAdmin = false; // admin es único, ningún usuario tiene ese rol
+      miNombre = u.nombre;
+      miColor  = u.color;
       conectarFirebase();
     } else {
       hide('scr-load');
@@ -507,7 +832,6 @@ function verificarAdmin(){
     return;
   }
   esAdmin = true;
-  // Si no hay uid local, crear sesión admin temporal
   if(!me){
     me = 'admin_session';
     miNombre = 'Supervisor';
@@ -534,51 +858,31 @@ function registrarme(){
   db.ref('usuarios').once('value', function(snap){
     var ud = snap.val() || {};
 
-    // Verificar nombre único
     var nombreUsado = Object.values(ud).some(function(u){ return u.nombre.toLowerCase() === nombre.toLowerCase(); });
-    if(nombreUsado){
-      hide('scr-load');
-      show('scr-reg');
-      showErr(errEl,'⚠️ Ese nombre ya está registrado. Usa otro.');
-      return;
-    }
+    if(nombreUsado){ hide('scr-load'); show('scr-reg'); showErr(errEl,'⚠️ Ese nombre ya está en uso. Usa otro.'); return; }
 
-    // Verificar PIN único
     var pinUsado = Object.values(ud).some(function(u){ return u.pin === pin; });
-    if(pinUsado){
-      hide('scr-load');
-      show('scr-reg');
-      showErr(errEl,'⚠️ Ese PIN ya está en uso. Elige otro.');
-      return;
-    }
+    if(pinUsado){ hide('scr-load'); show('scr-reg'); showErr(errEl,'⚠️ Ese PIN ya está en uso. Elige otro.'); return; }
 
-    // Color automático
     var usedColors = Object.values(ud).map(function(u){ return u.color; });
     var color = 0;
     while(usedColors.indexOf(color) !== -1) color++;
-
-    // ¿Es el primer usuario? → admin
-    var esFirstAdmin = Object.keys(ud).length === 0;
 
     var uid = 'u_'+Date.now();
     me      = uid;
     miNombre= nombre;
     miColor = color;
-    esAdmin = esFirstAdmin;
+    esAdmin = false;
 
     localStorage.setItem('pda-uid',    uid);
     localStorage.setItem('pda-nombre', nombre);
     localStorage.setItem('pda-color',  color);
 
     db.ref('usuarios/'+uid).set({
-      nombre: nombre,
-      color:  color,
-      pin:    pin,
-      esAdmin:esFirstAdmin,
-      deviceId: DEVICE_ID
+      nombre: nombre, color: color, pin: pin,
+      esAdmin: false, deviceId: DEVICE_ID
     }, function(err){
       if(err){ hide('scr-load'); show('scr-reg'); showErr(errEl,'❌ Error al registrar'); return; }
-      // Entrar directo a la app
       hide('scr-reg');
       mostrarLoad('Entrando…');
       conectarFirebase();
@@ -588,27 +892,73 @@ function registrarme(){
 
 function showErr(el, msg){ el.textContent=msg; el.style.display='block'; hide('scr-load'); }
 
-function cerrarSesion(){
-  // Solo admin puede salir (su sesion no es permanente)
-  if(esAdmin){
-    esAdmin=false;
-    if(localStorage.getItem('pda-uid')){
-      // Volver a login normal
-      location.reload();
-    } else {
-      location.reload();
+// ══════════════════════════════════════
+//  PRESENCIA EN LÍNEA
+// ══════════════════════════════════════
+function setupPresencia(){
+  if(!me || me === 'admin_session') return;
+  var presRef = db.ref('presencia/' + me);
+  db.ref('.info/connected').on('value', function(snap){
+    if(snap.val() === true){
+      presRef.onDisconnect().remove();
+      presRef.set({
+        nombre: miNombre,
+        color:  miColor,
+        ts: firebase.database.ServerValue.TIMESTAMP
+      });
     }
+  });
+}
+
+function renderOnline(){
+  var el = document.getElementById('online-section');
+  if(!el) return;
+  var keys = Object.keys(presencia);
+  if(keys.length === 0){
+    el.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;font-size:.8rem;color:var(--muted)">'
+      + '<span style="width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block"></span>Nadie en línea ahora</div>';
+    return;
   }
+  var html = '<div style="margin-bottom:6px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--green)">🟢 En línea ('+keys.length+')</div>'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+  keys.forEach(function(uid){
+    var p = presencia[uid];
+    var nombre = (users[uid] ? users[uid].nombre : p.nombre) || '?';
+    var c = (users[uid] ? users[uid].color : (p.color||0)) % COLORS_BG.length;
+    html += '<div class="eq-chip" style="background:'+COLORS_BG[c]+';border-color:'+COLORS_BDR[c]+'">'
+      + '<span class="online-dot"></span>'
+      + '<span style="color:'+COLORS_TEXT[c]+'">'+nombre+(uid===me?' <small style="opacity:.6;font-size:.68rem">(tú)</small>':'')+'</span>'
+      + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 // ══════════════════════════════════════
 //  FIREBASE
 // ══════════════════════════════════════
 function conectarFirebase(){
+  setupPresencia();
+  iniciarTimer();
+  document.getElementById('chat-fab').style.display = 'flex';
+
+  // Limpiar esAdmin de todos los usuarios (el admin es único, solo por contraseña)
+  if(esAdmin){
+    db.ref('usuarios').once('value', function(snap){
+      var ud = snap.val() || {};
+      var updates = {};
+      Object.keys(ud).forEach(function(uid){
+        if(ud[uid].esAdmin) updates['usuarios/'+uid+'/esAdmin'] = false;
+      });
+      if(Object.keys(updates).length > 0) db.ref().update(updates);
+    });
+  }
+
   db.ref('usuarios').on('value', function(snap){
     users = snap.val() || {};
     renderEquipo();
     renderSummary();
+    renderOnline();
     if(usuariosPanelVisible) renderUsersList();
   });
 
@@ -617,19 +967,25 @@ function conectarFirebase(){
     hide('scr-load');
     setSync('online');
 
-    // UI usuario
     document.getElementById('mi-info').style.display='flex';
     var dotColor = me && users[me] ? getTxt(me) : (esAdmin?'#8b5cf6':'#666');
     document.getElementById('mi-dot').style.background = dotColor;
     document.getElementById('mi-nombre-txt').textContent = miNombre;
     document.getElementById('mi-rol-txt').textContent = esAdmin ? '· 👑 Supervisor' : '· usuario';
 
-    // Botón admin
     if(esAdmin) document.getElementById('btn-admin-panel').style.display='flex';
+    // Mostrar botón cambiar PIN solo a usuarios normales (no admin session)
+    if(me && me !== 'admin_session') document.getElementById('btn-cambiar-pin').style.display='block';
 
     render();
   }, function(){
     hide('scr-load'); setSync('offline'); toast('❌ Error de conexión');
+  });
+
+  db.ref('presencia').on('value', function(snap){
+    presencia = snap.val() || {};
+    renderOnline();
+    renderLoginOnline();
   });
 }
 
@@ -667,15 +1023,17 @@ function renderTabla(){
     row.style.gridTemplateColumns=cols;
     var html='<div class="t-time">'+slot+'</div>';
 
-    diasKeys.forEach(function(dk,di){
+    diasKeys.forEach(function(dk){
       var key=dk+'-'+si;
       var t=sched[dk]&&sched[dk][si]!==undefined?sched[dk][si]:null;
       var isPending=selec[key]===true;
 
       if(isPending){
+        var sc=getSelColor(me);
+        var selStyle='background:'+sc.bg+';border-color:'+sc.bdr+';color:#fff';
         html+=modo==='reservar'
-          ?'<div class="cell"><button class="cbtn c-sel" onclick="deselec(\''+key+'\')">✓</button></div>'
-          :'<div class="cell"><button class="cbtn c-sel-lib" onclick="deselec(\''+key+'\')">✗</button></div>';
+          ?'<div class="cell"><button class="cbtn c-sel" style="'+selStyle+'" onclick="deselec(\''+key+'\')">✓</button></div>'
+          :'<div class="cell"><button class="cbtn c-sel-lib" style="'+selStyle+'" onclick="deselec(\''+key+'\')">✗</button></div>';
       } else if(t===null||t===undefined){
         html+=modo==='reservar'&&me
           ?'<div class="cell"><button class="cbtn c-free" onclick="seleccionar(\''+key+'\',\''+dk+'\','+si+')">＋</button></div>'
@@ -807,19 +1165,95 @@ function toggleUsuarios(){
 }
 
 function renderUsersList(){
+  renombrando = null;
   var list=document.getElementById('users-list');
   list.innerHTML='';
   Object.keys(users).forEach(function(uid){
     var u=users[uid];
     var item=document.createElement('div');
     item.className='user-item';
+    item.id='user-item-'+uid;
+
+    var isMe = uid===me;
+    var actionsHtml = isMe
+      ? '<span style="font-size:.72rem;color:var(--muted)">(tú)</span>'
+      : '<div class="user-actions">'
+          + (u.esAdmin ? '' : '<button class="btn-rename" onclick="iniciarRenombrar(\''+uid+'\',\''+u.nombre+'\')">✏️ Renombrar</button>')
+          + '<button class="btn-del" onclick="eliminarUsuario(\''+uid+'\',\''+u.nombre+'\')">🗑️ Eliminar</button>'
+        + '</div>';
+
     item.innerHTML='<div class="user-item-left">'
       +'<span class="user-dot" style="background:'+getTxt(uid)+'"></span>'
-      +u.nombre
+      +'<span id="nombre-txt-'+uid+'">'+u.nombre+'</span>'
       +'<span class="user-badge '+(u.esAdmin?'badge-admin':'badge-user')+'">'+(u.esAdmin?'Admin':'Usuario')+'</span>'
       +'</div>'
-      +(uid!==me?'<button class="btn-del" onclick="eliminarUsuario(\''+uid+'\',\''+u.nombre+'\')">🗑️ Eliminar</button>':'<span style="font-size:.72rem;color:var(--muted)">(tú)</span>');
+      + actionsHtml;
     list.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════
+//  RENOMBRAR USUARIO
+// ══════════════════════════════════════
+function iniciarRenombrar(uid, nombreActual){
+  // Cerrar cualquier rename abierto
+  if(renombrando && renombrando !== uid) cancelarRenombrar(renombrando);
+  renombrando = uid;
+
+  var item = document.getElementById('user-item-'+uid);
+  if(!item) return;
+
+  // Ocultar botones y mostrar input
+  var acciones = item.querySelector('.user-actions');
+  if(acciones) acciones.style.display='none';
+
+  var renRow = document.createElement('div');
+  renRow.className = 'rename-row';
+  renRow.id = 'rename-row-'+uid;
+  renRow.innerHTML = '<input class="rename-inp" id="rename-inp-'+uid+'" value="'+nombreActual+'" maxlength="14" placeholder="Nuevo nombre"/>'
+    + '<button class="btn-rename-ok" onclick="confirmarRenombrar(\''+uid+'\')">✓ Guardar</button>'
+    + '<button class="btn-rename-cancel" onclick="cancelarRenombrar(\''+uid+'\')">✕</button>';
+  item.appendChild(renRow);
+
+  setTimeout(function(){
+    var inp = document.getElementById('rename-inp-'+uid);
+    if(inp){ inp.focus(); inp.select(); }
+  }, 50);
+}
+
+function cancelarRenombrar(uid){
+  renombrando = null;
+  var row = document.getElementById('rename-row-'+uid);
+  if(row) row.remove();
+  var item = document.getElementById('user-item-'+uid);
+  if(item){
+    var acciones = item.querySelector('.user-actions');
+    if(acciones) acciones.style.display='flex';
+  }
+}
+
+function confirmarRenombrar(uid){
+  var inp = document.getElementById('rename-inp-'+uid);
+  if(!inp) return;
+  var nuevoNombre = inp.value.trim();
+  var nombreActual = users[uid] ? users[uid].nombre : '';
+
+  if(!nuevoNombre){ toast('⚠️ Escribe un nombre'); inp.focus(); return; }
+  if(nuevoNombre === nombreActual){ cancelarRenombrar(uid); return; }
+  if(nuevoNombre.length < 2){ toast('⚠️ Mínimo 2 caracteres'); inp.focus(); return; }
+
+  // Verificar que no exista
+  var existe = Object.keys(users).some(function(k){
+    return k !== uid && users[k].nombre.toLowerCase() === nuevoNombre.toLowerCase();
+  });
+  if(existe){ toast('⚠️ Ese nombre ya está en uso'); inp.focus(); return; }
+
+  setSync('saving');
+  db.ref('usuarios/'+uid+'/nombre').set(nuevoNombre, function(err){
+    setSync('online');
+    if(err){ toast('❌ Error al renombrar'); return; }
+    toast('✅ '+nombreActual+' → '+nuevoNombre);
+    cancelarRenombrar(uid);
   });
 }
 
@@ -840,7 +1274,6 @@ function eliminarUsuario(uid, nombre){
     '#ef4444','Eliminar',
     function(){
       setSync('saving');
-      // Borrar turnos de ese usuario
       db.ref('horario').once('value',function(snap){
         var h=snap.val()||{};
         var updates={};
@@ -865,8 +1298,7 @@ function borrarTodosHorarios(){
     function(){
       setSync('saving');
       db.ref('horario').set({},function(){
-        setSync('online');
-        selec={};
+        setSync('online'); selec={};
         toast('✅ Todos los horarios borrados');
       });
     });
@@ -877,12 +1309,9 @@ function nuevoMes(){
     'Se borran todos los turnos. Los usuarios se mantienen.<br><br>¿Confirmas?',
     '#f59e0b','Sí, reiniciar',
     function(){
-      setSync('saving');
-      selec={};
+      setSync('saving'); selec={};
       db.ref('horario').set({},function(){
-        setSync('online');
-        generarDias();
-        render();
+        setSync('online'); generarDias(); render();
         toast('✅ Horario reiniciado');
       });
     });
@@ -893,7 +1322,6 @@ function nuevoMes(){
 // ══════════════════════════════════════
 function exportarExcel(){
   var rows=[['Nombre','Color','Día','Fecha','Hora','Turno #']];
-
   diasKeys.forEach(function(dk){
     if(!sched[dk])return;
     for(var si=0;si<SLOTS.length;si++){
@@ -907,13 +1335,11 @@ function exportarExcel(){
           ['Rojo','Azul','Verde','Amarillo','Violeta','Naranja','Cyan','Rosa','Verde2','Naranja2'][u.color%10],
           DIAS[d.getDay()],
           p[2]+'/'+p[1]+'/'+p[0],
-          SLOTS[si],
-          si+1
+          SLOTS[si], si+1
         ]);
       }
     }
   });
-
   var wb=XLSX.utils.book_new();
   var ws=XLSX.utils.aoa_to_sheet(rows);
   ws['!cols']=[{wch:15},{wch:10},{wch:8},{wch:12},{wch:14},{wch:8}];
@@ -923,42 +1349,25 @@ function exportarExcel(){
 }
 
 // ══════════════════════════════════════
-//  MODAL / UTILS
+//  REPORTE
 // ══════════════════════════════════════
-function abrirModal(titulo,desc,color,textoOk,onOk){
-  document.getElementById('m-title').textContent=titulo;
-  document.getElementById('m-desc').innerHTML=desc;
-  var ok=document.getElementById('m-ok');
-  ok.textContent=textoOk; ok.style.background=color;
-  ok.onclick=function(){cerrarModal();onOk();};
-  document.getElementById('overlay').classList.add('open');
+function setRepTab(activo){
+  var tabs = ['tabla','matriz','grafico'];
+  tabs.forEach(function(t){
+    var btn = document.getElementById('rep-tab-'+t);
+    if(!btn) return;
+    btn.className = 'rep-tab' + (t===activo?' activo-'+t:'');
+  });
 }
-function cerrarModal(){ document.getElementById('overlay').classList.remove('open'); }
-
-function setSync(state){
-  var el=document.getElementById('sync');
-  el.className='sync'+(state==='offline'?' off':state==='saving'?' saving':'');
-  document.getElementById('sync-txt').textContent=
-    state==='online'?'En línea':state==='saving'?'Guardando…':'Sin conexión';
-}
-
-function show(id){ document.getElementById(id).classList.remove('hide'); }
-function hide(id){ document.getElementById(id).classList.add('hide'); }
-function mostrarLoad(txt){ document.getElementById('load-txt').textContent=txt; show('scr-load'); }
 
 function exportarReporte(){
   document.getElementById('overlay-reporte').classList.add('open');
-  verTabla();
+  verMatriz();
 }
 
+// Vista lista
 function verTabla(){
-  document.getElementById('btn-ver-tabla').style.background='#dcfce7';
-  document.getElementById('btn-ver-tabla').style.borderColor='#86efac';
-  document.getElementById('btn-ver-tabla').style.color='#166534';
-  document.getElementById('btn-ver-grafico').style.background='var(--bg)';
-  document.getElementById('btn-ver-grafico').style.borderColor='var(--border)';
-  document.getElementById('btn-ver-grafico').style.color='var(--muted)';
-
+  setRepTab('tabla');
   var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.76rem">'
     +'<thead><tr style="background:var(--card2)">'
     +'<th style="padding:8px;text-align:left;border:1px solid var(--border)">Usuario</th>'
@@ -992,15 +1401,72 @@ function verTabla(){
   document.getElementById('reporte-contenido').innerHTML=html;
 }
 
-function verGrafico(){
-  document.getElementById('btn-ver-grafico').style.background='#dbeafe';
-  document.getElementById('btn-ver-grafico').style.borderColor='#93c5fd';
-  document.getElementById('btn-ver-grafico').style.color='#1e40af';
-  document.getElementById('btn-ver-tabla').style.background='var(--bg)';
-  document.getElementById('btn-ver-tabla').style.borderColor='var(--border)';
-  document.getElementById('btn-ver-tabla').style.color='var(--muted)';
+// Vista matriz pivot: horas (filas) × días (columnas), usuarios en celdas
+function verMatriz(){
+  setRepTab('matriz');
 
-  // Contar turnos por usuario
+  var html = '<div class="matriz-wrap" id="matriz-wrap">'
+    + '<table style="border-collapse:collapse;font-size:.72rem;min-width:100%">'
+    + '<thead><tr>'
+    + '<th style="padding:6px 8px;background:var(--card2);border:1px solid var(--border);font-family:DM Mono,monospace;white-space:nowrap;min-width:90px;font-size:.65rem;color:var(--muted);position:sticky;left:0;z-index:2">Hora</th>';
+
+  diasKeys.forEach(function(dk){
+    var p=dk.split('-'), d=new Date(+p[0],+p[1]-1,+p[2]);
+    html += '<th style="padding:5px 6px;background:var(--card2);border:1px solid var(--border);text-align:center;min-width:58px;font-size:.65rem">'
+      + DIAS[d.getDay()] + '<br><span style="font-size:.55rem;font-weight:400;color:var(--muted)">'+p[2]+'/'+p[1]+'</span>'
+      + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  SLOTS.forEach(function(slot, si){
+    html += '<tr>'
+      + '<td style="padding:5px 8px;border:1px solid var(--border);font-family:DM Mono,monospace;font-size:.6rem;white-space:nowrap;color:var(--muted);background:var(--card2);position:sticky;left:0;z-index:1">'
+      + slot + '</td>';
+
+    diasKeys.forEach(function(dk){
+      var uid = sched[dk] && sched[dk][si] !== undefined ? sched[dk][si] : null;
+      if(uid && users[uid]){
+        html += '<td style="padding:3px;border:1px solid var(--border);text-align:center">'
+          + '<div style="background:'+getBg(uid)+';color:'+getTxt(uid)+';border:1px solid '+getBdr(uid)
+          + ';border-radius:6px;padding:3px 5px;font-weight:700;font-size:.68rem;white-space:nowrap">'
+          + users[uid].nombre.substring(0,6)
+          + '</div></td>';
+      } else {
+        html += '<td style="border:1px solid var(--border);background:#fafafa"></td>';
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>'
+    + '<div class="slider-wrap"><input type="range" id="matriz-slider" min="0" max="100" value="0" oninput="scrollMatriz(this.value)"></div>';
+
+  document.getElementById('reporte-contenido').innerHTML = html;
+
+  // Calibrar slider tras render
+  setTimeout(function(){
+    var wrap = document.getElementById('matriz-wrap');
+    var slider = document.getElementById('matriz-slider');
+    if(wrap && slider){
+      var maxScroll = wrap.scrollWidth - wrap.clientWidth;
+      if(maxScroll > 0){
+        slider.max = maxScroll;
+        wrap.addEventListener('scroll', function(){ slider.value = wrap.scrollLeft; });
+      } else {
+        slider.style.display='none';
+      }
+    }
+  }, 60);
+}
+
+function scrollMatriz(val){
+  var wrap = document.getElementById('matriz-wrap');
+  if(wrap) wrap.scrollLeft = parseInt(val);
+}
+
+// Vista gráfico
+function verGrafico(){
+  setRepTab('grafico');
   var conteos={};
   Object.keys(users).forEach(function(uid){ conteos[uid]=0; });
   diasKeys.forEach(function(dk){
@@ -1018,8 +1484,8 @@ function verGrafico(){
     var pct=Math.round(c/max*100);
     html+='<div style="margin-bottom:14px">'
       +'<div style="display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;margin-bottom:5px">'
-      +'<span style="color:'+getTxt(uid)+'">'+u.nombre+'</span>'
-      +'<span style="color:var(--muted)">'+c+' turno'+(c!==1?'s':'')+'  ('+c+'h)</span>'
+      +'<span style="color:'+getTxt(uid)+'">'+u.nombre+(u.esAdmin?' 👑':'')+'</span>'
+      +'<span style="color:var(--muted)">'+c+' turno'+(c!==1?'s':'')+' ('+c+'h)</span>'
       +'</div>'
       +'<div style="background:var(--border);border-radius:99px;height:22px;overflow:hidden">'
       +'<div style="width:'+pct+'%;background:'+getTxt(uid)+';height:100%;border-radius:99px;display:flex;align-items:center;padding-left:8px;transition:width .5s">'
@@ -1030,10 +1496,304 @@ function verGrafico(){
   document.getElementById('reporte-contenido').innerHTML=html;
 }
 
+// ══════════════════════════════════════
+//  MODAL / UTILS
+// ══════════════════════════════════════
+function abrirModal(titulo,desc,color,textoOk,onOk){
+  document.getElementById('m-title').textContent=titulo;
+  document.getElementById('m-desc').innerHTML=desc;
+  var ok=document.getElementById('m-ok');
+  ok.textContent=textoOk; ok.style.background=color;
+  ok.onclick=function(){cerrarModal();onOk();};
+  document.getElementById('overlay').classList.add('open');
+}
+function cerrarModal(){ document.getElementById('overlay').classList.remove('open'); }
+
+function setSync(state){
+  var el=document.getElementById('sync');
+  el.className='sync'+(state==='offline'?' off':state==='saving'?' saving':'');
+  document.getElementById('sync-txt').textContent=
+    state==='online'?'En línea':state==='saving'?'Guardando…':'Sin conexión';
+}
+
+function show(id){ document.getElementById(id).classList.remove('hide'); }
+function hide(id){ document.getElementById(id).classList.add('hide'); }
+function mostrarLoad(txt){ document.getElementById('load-txt').textContent=txt; show('scr-load'); }
+
 function toast(msg){
   var el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('on');
   setTimeout(function(){el.classList.remove('on');},2800);
+}
+
+// ══════════════════════════════════════
+//  COUNTDOWN TIMER
+// ══════════════════════════════════════
+var timerInterval = null;
+var fechaInventario = null;
+var eventoNombre = '';
+var eventoAbierto = false;
+
+function iniciarTimer(){
+  // Botón oculto solo visible para admin
+  if(esAdmin){
+    document.getElementById('btn-timer-admin').style.display = 'inline-block';
+  }
+
+  db.ref('config/fechaInventario').on('value', function(snap){
+    var data = snap.val();
+    if(data && data.fecha){
+      fechaInventario = new Date(data.fecha);
+      eventoNombre = data.nombre || 'Próximo inventario';
+      document.getElementById('timer-bar').style.display = 'flex';
+      document.getElementById('timer-event-txt').textContent = eventoNombre;
+      if(timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(tickTimer, 1000);
+      tickTimer();
+    } else {
+      fechaInventario = null;
+      document.getElementById('timer-bar').style.display = esAdmin ? 'flex' : 'none';
+      if(!esAdmin){ if(timerInterval) clearInterval(timerInterval); return; }
+      // Admin: mostrar barra vacía con botón para configurar
+      document.getElementById('timer-event-txt').textContent = 'Sin fecha configurada';
+      document.getElementById('timer-digits').innerHTML =
+        '<span style="font-size:.72rem;color:var(--muted)">Toca ⚙ para agregar</span>';
+    }
+  });
+}
+
+function tickTimer(){
+  if(!fechaInventario) return;
+  var ahora = new Date();
+  var diff = fechaInventario - ahora;
+  var el = document.getElementById('timer-digits');
+  if(!el) return;
+
+  if(diff <= 0){
+    el.innerHTML = '<span class="timer-pasado">✅ ¡Hoy es el día!</span>';
+    return;
+  }
+
+  var dias  = Math.floor(diff / 86400000);
+  var horas = Math.floor((diff % 86400000) / 3600000);
+  var mins  = Math.floor((diff % 3600000)  / 60000);
+  var segs  = Math.floor((diff % 60000)    / 1000);
+  var urgente = dias < 2;
+  var cls = urgente ? ' urgente' : '';
+
+  function blk(n, u){
+    return '<div class="timer-block'+cls+'"><span class="timer-n">'+String(n).padStart(2,'0')+'</span><span class="timer-u">'+u+'</span></div>';
+  }
+
+  var html = '';
+  if(dias > 0) html += blk(dias,'días') + '<span class="timer-sep">:</span>';
+  html += blk(horas,'hrs') + '<span class="timer-sep">:</span>';
+  html += blk(mins,'min') + '<span class="timer-sep">:</span>';
+  html += blk(segs,'seg');
+  el.innerHTML = html;
+
+  // Cambiar label si es urgente
+  var lbl = document.getElementById('timer-event-txt');
+  if(lbl) lbl.className = 'timer-event' + cls;
+}
+
+function abrirFechaModal(){
+  if(!esAdmin){ return; }
+  var inp = document.getElementById('inp-fecha');
+  if(fechaInventario){
+    // Formatear para datetime-local (YYYY-MM-DDTHH:MM)
+    var iso = new Date(fechaInventario.getTime() - fechaInventario.getTimezoneOffset()*60000)
+               .toISOString().slice(0,16);
+    inp.value = iso;
+  } else {
+    inp.value = '';
+  }
+  document.getElementById('inp-evento').value = eventoNombre || '';
+  document.getElementById('overlay-fecha').classList.add('open');
+}
+
+function guardarFechaInventario(){
+  var val   = document.getElementById('inp-fecha').value;
+  var nombre = document.getElementById('inp-evento').value.trim() || 'Próximo inventario';
+  if(!val){ toast('⚠️ Selecciona una fecha'); return; }
+  var fecha = new Date(val);
+  if(isNaN(fecha.getTime())){ toast('⚠️ Fecha inválida'); return; }
+  db.ref('config/fechaInventario').set({ fecha: fecha.toISOString(), nombre: nombre }, function(err){
+    if(err){ toast('❌ Error al guardar'); return; }
+    toast('✅ Fecha guardada');
+    document.getElementById('overlay-fecha').classList.remove('open');
+  });
+}
+
+function borrarFechaInventario(){
+  db.ref('config/fechaInventario').remove(function(){
+    toast('🗑️ Cuenta regresiva eliminada');
+    document.getElementById('overlay-fecha').classList.remove('open');
+    if(timerInterval) clearInterval(timerInterval);
+  });
+}
+
+// ══════════════════════════════════════
+//  CHAT FLOTANTE
+// ══════════════════════════════════════
+var chatAbierto = false;
+var chatIniciado = false;
+var mensajesNuevos = 0;
+
+function toggleChat(){
+  chatAbierto = !chatAbierto;
+  var win = document.getElementById('chat-win');
+  if(chatAbierto){
+    win.classList.remove('hide');
+    mensajesNuevos = 0;
+    actualizarBadge();
+    if(!chatIniciado) iniciarChat();
+    setTimeout(function(){ scrollChat(); }, 80);
+    setTimeout(function(){
+      document.getElementById('chat-inp').focus();
+    }, 200);
+  } else {
+    win.classList.add('hide');
+  }
+}
+
+function iniciarChat(){
+  chatIniciado = true;
+  db.ref('chat').limitToLast(100).on('value', function(snap){
+    var msgs = snap.val() || {};
+    renderMensajes(msgs);
+    if(!chatAbierto){
+      mensajesNuevos++;
+      actualizarBadge();
+    } else {
+      mensajesNuevos = 0;
+      actualizarBadge();
+    }
+  });
+}
+
+function renderMensajes(msgs){
+  var el = document.getElementById('chat-msgs');
+  if(!el) return;
+  var keys = Object.keys(msgs).sort();
+  var html = '';
+  keys.forEach(function(k){
+    var m = msgs[k];
+    var esMio = m.uid === me;
+    var hora = new Date(m.ts);
+    var hStr = String(hora.getHours()).padStart(2,'0') + ':' + String(hora.getMinutes()).padStart(2,'0');
+    html += '<div class="chat-msg ' + (esMio ? 'mio' : 'otro') + '">'
+      + (!esMio ? '<div class="chat-msg-nombre">' + (m.nombre||'?') + '</div>' : '')
+      + '<div>' + escHTML(m.texto) + '</div>'
+      + '<div class="chat-msg-hora">' + hStr + '</div>'
+      + '</div>';
+  });
+  el.innerHTML = html || '<div style="text-align:center;color:var(--muted);font-size:.78rem;padding:20px">Sé el primero en escribir 👋</div>';
+  scrollChat();
+}
+
+function scrollChat(){
+  var el = document.getElementById('chat-msgs');
+  if(el) el.scrollTop = el.scrollHeight;
+}
+
+function actualizarBadge(){
+  var badge = document.getElementById('chat-badge');
+  if(!badge) return;
+  if(mensajesNuevos > 0 && !chatAbierto){
+    badge.style.display = 'flex';
+    badge.textContent = mensajesNuevos > 9 ? '9+' : mensajesNuevos;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function enviarMensaje(){
+  var inp = document.getElementById('chat-inp');
+  var texto = inp.value.trim();
+  if(!texto) return;
+  if(!me){ toast('⚠️ Inicia sesión para chatear'); return; }
+
+  inp.value = '';
+  var nuevo = {
+    uid:    me,
+    nombre: miNombre,
+    texto:  texto,
+    ts:     firebase.database.ServerValue.TIMESTAMP
+  };
+
+  // Agregar mensaje y limpiar si supera 100
+  var ref = db.ref('chat').push();
+  ref.set(nuevo, function(err){
+    if(err){ toast('❌ No se pudo enviar'); inp.value = texto; }
+  });
+
+  // Limpiar mensajes de más de 7 días
+  var limite7dias = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  db.ref('chat').orderByChild('ts').endAt(limite7dias).once('value', function(snap){
+    if(!snap.val()) return;
+    var updates = {};
+    Object.keys(snap.val()).forEach(function(k){ updates['chat/'+k] = null; });
+    db.ref().update(updates);
+  });
+}
+
+// ══════════════════════════════════════
+//  CAMBIAR PIN
+// ══════════════════════════════════════
+function abrirCambiarPin(){
+  document.getElementById('pin-actual').value='';
+  document.getElementById('pin-nuevo').value='';
+  document.getElementById('pin-confirmar').value='';
+  document.getElementById('pin-change-err').style.display='none';
+  document.getElementById('overlay-pin').classList.add('open');
+  setTimeout(function(){ document.getElementById('pin-actual').focus(); }, 200);
+}
+
+function cerrarCambiarPin(){
+  document.getElementById('overlay-pin').classList.remove('open');
+}
+
+function confirmarCambiarPin(){
+  var actual    = document.getElementById('pin-actual').value.trim();
+  var nuevo     = document.getElementById('pin-nuevo').value.trim();
+  var confirmar = document.getElementById('pin-confirmar').value.trim();
+  var errEl     = document.getElementById('pin-change-err');
+
+  function showPinErr(msg){ errEl.textContent=msg; errEl.style.display='block'; }
+
+  if(!actual){ showPinErr('⚠️ Ingresa tu PIN actual'); return; }
+  if(nuevo.length !== 2 || isNaN(nuevo)){ showPinErr('⚠️ El PIN nuevo debe ser 2 dígitos'); return; }
+  if(nuevo !== confirmar){ showPinErr('⚠️ Los PINs nuevos no coinciden'); return; }
+  if(nuevo === actual){ showPinErr('⚠️ El PIN nuevo debe ser diferente al actual'); return; }
+
+  // Verificar PIN actual contra Firebase
+  db.ref('usuarios/'+me+'/pin').once('value', function(snap){
+    if(snap.val() !== actual){
+      showPinErr('❌ PIN actual incorrecto');
+      return;
+    }
+    // Verificar que el nuevo PIN no lo use otro usuario
+    db.ref('usuarios').once('value', function(snap2){
+      var ud = snap2.val() || {};
+      var pinUsado = Object.keys(ud).some(function(k){ return k !== me && ud[k].pin === nuevo; });
+      if(pinUsado){ showPinErr('⚠️ Ese PIN ya lo usa otro usuario'); return; }
+
+      db.ref('usuarios/'+me+'/pin').set(nuevo, function(err){
+        if(err){ showPinErr('❌ Error al guardar'); return; }
+        cerrarCambiarPin();
+        toast('✅ PIN cambiado correctamente');
+      });
+    });
+  });
+}
+
+function escHTML(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
 </script>
 </body>
