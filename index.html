@@ -245,26 +245,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <p>Inventario · tiempo real</p>
     </div>
 
-    <!-- Timer evento (público) -->
+    <!-- Timer cuenta regresiva (público) -->
     <div class="login-preview-card" id="login-timer-card" style="padding:10px 14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:4px">
-        <span id="login-timer-event" style="font-size:.78rem;font-weight:700;color:var(--text)">Cargando…</span>
+      <div class="login-preview-title" style="margin-bottom:6px">⏱ Próximo evento</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span id="login-timer-event" style="font-size:.78rem;font-weight:600;color:var(--text)">Cargando…</span>
         <div class="timer-digits" id="login-timer-digits"></div>
-      </div>
-      <div id="login-timer-slider-row" style="display:none;width:100%;margin-top:4px">
-        <input type="range" id="login-timer-slider" min="1" max="10" value="1"
-          style="width:100%;height:4px;cursor:default;pointer-events:none;accent-color:#10b981;display:block">
-        <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-top:2px">
-          <span>Día 1</span>
-          <span id="login-timer-mark" style="font-weight:600"></span>
-          <span id="login-timer-fin"></span>
-        </div>
       </div>
     </div>
 
     <!-- Preview del horario (público) -->
     <div class="login-preview-card">
-      <div class="login-preview-title" id="login-preview-title">📅 Horario del mes</div>
+      <div class="login-preview-title">📅 Horario de esta semana</div>
       <div id="login-preview-wrap" style="overflow-x:auto">
         <div style="text-align:center;padding:18px;color:var(--muted);font-size:.8rem">Cargando horario…</div>
       </div>
@@ -375,24 +367,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </button>
   </div>
 
-  <!-- TIMER / BARRA DE EVENTO -->
-  <div class="timer-bar" id="timer-bar" style="display:none;flex-direction:column;gap:6px">
-    <div style="display:flex;align-items:center;gap:8px;min-width:0">
-      <span id="timer-estado-txt" class="timer-event"></span>
+  <!-- COUNTDOWN TIMER -->
+  <div class="timer-bar" id="timer-bar" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+      <span id="timer-event-txt" class="timer-event">Próximo inventario</span>
       <button class="btn-timer-admin" id="btn-timer-admin" onclick="abrirFechaModal()" style="display:none">⚙ Configurar</button>
     </div>
-    <!-- Countdown: visible antes de que llegue el evento -->
-    <div id="timer-countdown-row" class="timer-digits" style="display:none"></div>
-    <!-- Slider activo: visible durante los días activos -->
-    <div id="timer-slider-row" style="display:none;width:100%">
-      <input type="range" id="timer-slider" min="1" max="10" value="1"
-        style="width:100%;height:4px;cursor:default;pointer-events:none;accent-color:#10b981;display:block">
-      <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-top:2px">
-        <span id="timer-dia-label">Día 1</span>
-        <span id="timer-mark-label" style="font-weight:600"></span>
-        <span id="timer-fin-label"></span>
-      </div>
-    </div>
+    <div class="timer-digits" id="timer-digits"></div>
   </div>
 
   <div class="tip">💡 Elige modo → toca los turnos → confirma todos juntos.</div>
@@ -481,21 +462,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
-<!-- MODAL CONFIGURAR EVENTO (solo admin) -->
+<!-- MODAL FECHA INVENTARIO (solo admin) -->
 <div class="overlay" id="overlay-fecha" style="align-items:center">
   <div class="fecha-modal">
-    <h3>⏱ Configurar Evento</h3>
+    <h3>⏱ Fecha del Inventario</h3>
     <label class="flabel">Nombre del evento</label>
     <input class="inp-evento" id="inp-evento" placeholder="Ej: Inventario Mayo" maxlength="30"/>
-    <label class="flabel">Fecha y hora de inicio</label>
+    <label class="flabel">Fecha y hora</label>
     <input class="inp-fecha" id="inp-fecha" type="datetime-local"/>
-    <label class="flabel">Días activos (selecciones abiertas)</label>
-    <input class="inp-fecha" id="inp-dias-activos" type="number" min="1" max="30" placeholder="10" style="margin-bottom:14px"/>
     <div class="modal-btns" style="margin-top:4px">
       <button class="m-no" onclick="document.getElementById('overlay-fecha').classList.remove('open')">Cancelar</button>
       <button class="m-ok" style="background:var(--purple)" onclick="guardarFechaInventario()">✓ Guardar</button>
     </div>
-    <button style="margin-top:10px;width:100%;padding:10px;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="borrarFechaInventario()">🗑️ Quitar evento</button>
+    <button style="margin-top:10px;width:100%;padding:10px;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="borrarFechaInventario()">🗑️ Quitar cuenta regresiva</button>
   </div>
 </div>
 
@@ -569,9 +548,6 @@ var selec    = {};
 var diasKeys = [];
 var offsetSemana = 0;
 var presencia = {};
-var presenciaAnteriorKeys = null;
-var seleccionHabilitada = false;
-var diasActivos = 10;
 var adminPanelVisible = false;
 var usuariosPanelVisible = false;
 var renombrando = null;
@@ -599,16 +575,16 @@ function getDayLabel(dk){
 function generarDias(){
   diasKeys=[];
   var hoy=new Date();
-  var año=hoy.getFullYear(), mes=hoy.getMonth()+offsetSemana;
-  año += Math.floor(mes/12); mes = ((mes%12)+12)%12;
-  var totalDias=new Date(año,mes+1,0).getDate();
-  for(var i=1;i<=totalDias;i++){
-    diasKeys.push(getFechaStr(new Date(año,mes,i)));
+  hoy.setDate(hoy.getDate() + offsetSemana*7);
+  for(var i=0;i<SHOW_DAYS;i++){
+    var d=new Date(hoy); d.setDate(hoy.getDate()+i);
+    diasKeys.push(getFechaStr(d));
   }
   var lbl = document.getElementById('semana-label');
   if(lbl){
-    var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    lbl.textContent = meses[mes]+' '+año;
+    var p1=diasKeys[0].split('-'), p2=diasKeys[6].split('-');
+    var meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    lbl.textContent = p1[2]+' '+meses[+p1[1]-1]+' – '+p2[2]+' '+meses[+p2[1]-1]+' '+p2[0];
   }
 }
 
@@ -664,72 +640,45 @@ window.onload = function(){
 // ══════════════════════════════════════
 //  PREVIEW LOGIN (horario público)
 // ══════════════════════════════════════
+var loginTimerInterval = null;
+
 function iniciarLoginTimer(){
-  var eventEl   = document.getElementById('login-timer-event');
-  var digitEl   = document.getElementById('login-timer-digits');
-  var sliderRow = document.getElementById('login-timer-slider-row');
-  var slider    = document.getElementById('login-timer-slider');
-  var markEl    = document.getElementById('login-timer-mark');
-  var finEl     = document.getElementById('login-timer-fin');
-  if(!eventEl) return;
+  db.ref('config/fechaInventario').on('value', function(snap){
+    var data = snap.val();
+    var eventEl  = document.getElementById('login-timer-event');
+    var digitEl  = document.getElementById('login-timer-digits');
+    if(!eventEl || !digitEl) return;
 
-  Promise.all([
-    db.ref('config/fechaInventario').once('value'),
-    db.ref('config/diasActivos').once('value')
-  ]).then(function(snaps){
-    var data = snaps[0].val();
-    var da   = snaps[1].val() || 10;
+    if(loginTimerInterval) clearInterval(loginTimerInterval);
 
-    if(!data || !data.fecha){
-      eventEl.textContent = 'Sin evento configurado';
-      digitEl.innerHTML   = '';
-      return;
-    }
-
-    var fecha      = new Date(data.fecha);
-    var nombre     = data.nombre || 'Próximo evento';
-    var ahora      = new Date();
-    var diff       = fecha - ahora;
-    var finVentana = new Date(fecha.getTime() + da * 86400000);
-    var diffFin    = finVentana - ahora;
-
-    if(diff > 0){
-      // Cuenta regresiva
-      var dias  = Math.floor(diff / 86400000);
-      var horas = Math.floor((diff % 86400000) / 3600000);
-      var mins  = Math.floor((diff % 3600000)  / 60000);
-      var segs  = Math.floor((diff % 60000)    / 1000);
-      var cls   = dias < 2 ? ' urgente' : '';
-      function blk(n,u){ return '<div class="timer-block'+cls+'"><span class="timer-n">'+String(n).padStart(2,'0')+'</span><span class="timer-u">'+u+'</span></div>'; }
-      var h = '';
-      if(dias > 0) h += blk(dias,'días') + '<span class="timer-sep">:</span>';
-      h += blk(horas,'hrs') + '<span class="timer-sep">:</span>';
-      h += blk(mins,'min') + '<span class="timer-sep">:</span>';
-      h += blk(segs,'seg');
-      eventEl.textContent = nombre;
-      eventEl.style.color = '';
-      digitEl.innerHTML   = h;
-      sliderRow.style.display = 'none';
-
-    } else if(diffFin > 0){
-      // Ventana activa
-      var diaActual = Math.floor((ahora - fecha) / 86400000) + 1;
-      eventEl.textContent = '🟢 ' + nombre + ' — Selecciones abiertas';
-      eventEl.style.color = '#10b981';
-      digitEl.innerHTML   = '';
-      sliderRow.style.display = 'block';
-      slider.max   = da;
-      slider.value = diaActual;
-      slider.style.accentColor = '#10b981';
-      if(markEl) markEl.textContent = 'Día ' + diaActual + ' de ' + da;
-      if(finEl)  finEl.textContent  = 'Día ' + da;
-
+    if(data && data.fecha){
+      eventEl.textContent = data.nombre || 'Próximo inventario';
+      var target = new Date(data.fecha);
+      loginTimerInterval = setInterval(function(){
+        var diff = target - new Date();
+        if(diff <= 0){
+          digitEl.innerHTML = '<span class="timer-pasado">✅ ¡Hoy es el día!</span>';
+          clearInterval(loginTimerInterval);
+          return;
+        }
+        var dias  = Math.floor(diff / 86400000);
+        var horas = Math.floor((diff % 86400000) / 3600000);
+        var mins  = Math.floor((diff % 3600000)  / 60000);
+        var segs  = Math.floor((diff % 60000)    / 1000);
+        var urgente = dias < 2;
+        var cls = urgente ? ' urgente' : '';
+        function blk(n,u){ return '<div class="timer-block'+cls+'"><span class="timer-n">'+String(n).padStart(2,'0')+'</span><span class="timer-u">'+u+'</span></div>'; }
+        var h = '';
+        if(dias > 0) h += blk(dias,'días') + '<span class="timer-sep">:</span>';
+        h += blk(horas,'hrs') + '<span class="timer-sep">:</span>';
+        h += blk(mins,'min') + '<span class="timer-sep">:</span>';
+        h += blk(segs,'seg');
+        digitEl.innerHTML = h;
+        eventEl.className = 'timer-event' + cls;
+      }, 1000);
     } else {
-      // Período cerrado
-      eventEl.textContent = '🔒 ' + nombre + ' — Período cerrado';
-      eventEl.style.color = '#ef4444';
-      digitEl.innerHTML   = '';
-      sliderRow.style.display = 'none';
+      eventEl.textContent = 'Sin fecha configurada';
+      digitEl.innerHTML = '<span style="font-size:.72rem;color:var(--muted)">— — : — —</span>';
     }
   });
 }
@@ -754,9 +703,8 @@ function renderLoginPreview(pu, ps){
 
   var previewDias = [];
   var hoy = new Date();
-  var ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
-  for(var i = 1; i <= ultimoDia; i++){
-    var d = new Date(hoy.getFullYear(), hoy.getMonth(), i);
+  for(var i=0;i<7;i++){
+    var d=new Date(hoy); d.setDate(hoy.getDate()+i);
     previewDias.push(getFechaStr(d));
   }
 
@@ -941,25 +889,6 @@ function registrarme(){
 function showErr(el, msg){ el.textContent=msg; el.style.display='block'; hide('scr-load'); }
 
 // ══════════════════════════════════════
-//  SONIDO CONEXIÓN
-// ══════════════════════════════════════
-function beepConexion(){
-  try{
-    var ctx = new (window.AudioContext||window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.25, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.35);
-  }catch(e){}
-}
-
-// ══════════════════════════════════════
 //  PRESENCIA EN LÍNEA
 // ══════════════════════════════════════
 function setupPresencia(){
@@ -1051,15 +980,6 @@ function conectarFirebase(){
 
   db.ref('presencia').on('value', function(snap){
     presencia = snap.val() || {};
-    var nuevasKeys = Object.keys(presencia);
-    if(presenciaAnteriorKeys !== null){
-      nuevasKeys.forEach(function(uid){
-        if(uid !== me && users[uid] && presenciaAnteriorKeys.indexOf(uid) === -1){
-          beepConexion();
-        }
-      });
-    }
-    presenciaAnteriorKeys = nuevasKeys.slice();
     renderOnline();
     renderLoginOnline();
   });
@@ -1111,13 +1031,13 @@ function renderTabla(){
           ?'<div class="cell"><button class="cbtn c-sel" style="'+selStyle+'" onclick="deselec(\''+key+'\')">✓</button></div>'
           :'<div class="cell"><button class="cbtn c-sel-lib" style="'+selStyle+'" onclick="deselec(\''+key+'\')">✗</button></div>';
       } else if(t===null||t===undefined){
-        html+=modo==='reservar'&&me&&(esAdmin||seleccionHabilitada)
+        html+=modo==='reservar'&&me
           ?'<div class="cell"><button class="cbtn c-free" onclick="seleccionar(\''+key+'\',\''+dk+'\','+si+')">＋</button></div>'
           :'<div class="cell"><button class="cbtn c-empty"></button></div>';
       } else {
         var nombre=users[t]?users[t].nombre.substring(0,5):'?';
         var bg=getBg(t),txt=getTxt(t),bdr=getBdr(t);
-        var puedeLiberar=(t===me&&(esAdmin||seleccionHabilitada))||(esAdmin);
+        var puedeLiberar=(t===me)||(esAdmin);
         if(puedeLiberar&&modo==='liberar')
           html+='<div class="cell"><button class="cbtn c-mine" style="background:'+bg+';border-color:'+bdr+';color:'+txt+'" onclick="seleccionar(\''+key+'\',\''+dk+'\','+si+')">'+nombre+'</button></div>';
         else
@@ -1171,7 +1091,6 @@ function setModo(m){
 //  SELECCIÓN
 // ══════════════════════════════════════
 function seleccionar(key,dk,si){
-  if(!esAdmin && !seleccionHabilitada){ toast('🔒 Selecciones cerradas'); return; }
   if(modo==='reservar'){
     var t=sched[dk]&&sched[dk][si]!==undefined?sched[dk][si]:null;
     if(t!==null){toast('⚠️ Turno ya ocupado');return;}
@@ -1604,141 +1523,106 @@ function toast(msg){
 }
 
 // ══════════════════════════════════════
-//  TIMER DE EVENTO
+//  COUNTDOWN TIMER
 // ══════════════════════════════════════
-var timerInterval  = null;
+var timerInterval = null;
 var fechaInventario = null;
-var eventoNombre   = '';
+var eventoNombre = '';
 
 function iniciarTimer(){
-  if(esAdmin) document.getElementById('btn-timer-admin').style.display = 'inline-block';
-
-  db.ref('config/diasActivos').on('value', function(snap){
-    diasActivos = snap.val() || 10;
-    if(fechaInventario) tickTimer();
-  });
+  // Botón oculto solo visible para admin
+  if(esAdmin){
+    document.getElementById('btn-timer-admin').style.display = 'inline-block';
+  }
 
   db.ref('config/fechaInventario').on('value', function(snap){
     var data = snap.val();
     if(data && data.fecha){
       fechaInventario = new Date(data.fecha);
-      eventoNombre    = data.nombre || 'Próximo evento';
-      document.getElementById('timer-bar').style.display   = 'flex';
-      document.getElementById('timer-estado-txt').textContent = eventoNombre;
+      eventoNombre = data.nombre || 'Próximo inventario';
+      document.getElementById('timer-bar').style.display = 'flex';
+      document.getElementById('timer-event-txt').textContent = eventoNombre;
       if(timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(tickTimer, 1000);
       tickTimer();
     } else {
       fechaInventario = null;
-      seleccionHabilitada = false;
-      renderTabla();
-      if(timerInterval) clearInterval(timerInterval);
-      document.getElementById('timer-bar').style.display        = esAdmin ? 'flex' : 'none';
-      document.getElementById('timer-countdown-row').style.display = 'none';
-      document.getElementById('timer-slider-row').style.display    = 'none';
-      var est = document.getElementById('timer-estado-txt');
-      est.textContent = esAdmin ? 'Sin evento configurado — toca ⚙' : '';
-      est.style.color = '';
+      document.getElementById('timer-bar').style.display = esAdmin ? 'flex' : 'none';
+      if(!esAdmin){ if(timerInterval) clearInterval(timerInterval); return; }
+      // Admin: mostrar barra vacía con botón para configurar
+      document.getElementById('timer-event-txt').textContent = 'Sin fecha configurada';
+      document.getElementById('timer-digits').innerHTML =
+        '<span style="font-size:.72rem;color:var(--muted)">Toca ⚙ para agregar</span>';
     }
   });
 }
 
 function tickTimer(){
   if(!fechaInventario) return;
-  var ahora     = new Date();
-  var diff      = fechaInventario - ahora;
-  var finVentana = new Date(fechaInventario.getTime() + diasActivos * 86400000);
-  var diffFin   = finVentana - ahora;
+  var ahora = new Date();
+  var diff = fechaInventario - ahora;
+  var el = document.getElementById('timer-digits');
+  if(!el) return;
 
-  var estadoEl    = document.getElementById('timer-estado-txt');
-  var countdownEl = document.getElementById('timer-countdown-row');
-  var sliderRow   = document.getElementById('timer-slider-row');
-  var eraHabilitada = seleccionHabilitada;
-
-  if(diff > 0){
-    // ── Cuenta regresiva ──
-    seleccionHabilitada = false;
-    countdownEl.style.display = 'flex';
-    sliderRow.style.display   = 'none';
-    estadoEl.textContent = eventoNombre;
-    estadoEl.style.color = '';
-
-    var dias  = Math.floor(diff / 86400000);
-    var horas = Math.floor((diff % 86400000) / 3600000);
-    var mins  = Math.floor((diff % 3600000)  / 60000);
-    var segs  = Math.floor((diff % 60000)    / 1000);
-    var cls   = dias < 2 ? ' urgente' : '';
-    function blk(n,u){ return '<div class="timer-block'+cls+'"><span class="timer-n">'+String(n).padStart(2,'0')+'</span><span class="timer-u">'+u+'</span></div>'; }
-    var h = '';
-    if(dias > 0) h += blk(dias,'días') + '<span class="timer-sep">:</span>';
-    h += blk(horas,'hrs') + '<span class="timer-sep">:</span>';
-    h += blk(mins,'min') + '<span class="timer-sep">:</span>';
-    h += blk(segs,'seg');
-    countdownEl.innerHTML = h;
-
-  } else if(diffFin > 0){
-    // ── Ventana activa ──
-    seleccionHabilitada = true;
-    countdownEl.style.display = 'none';
-    sliderRow.style.display   = 'block';
-    estadoEl.textContent = '🟢 ' + eventoNombre + ' — Selecciones abiertas';
-    estadoEl.style.color = '#10b981';
-
-    var diaActual = Math.floor((ahora - fechaInventario) / 86400000) + 1;
-    var slider = document.getElementById('timer-slider');
-    slider.max   = diasActivos;
-    slider.value = diaActual;
-    slider.style.accentColor = '#10b981';
-    document.getElementById('timer-dia-label').textContent  = 'Día 1';
-    document.getElementById('timer-mark-label').textContent = 'Día ' + diaActual + ' de ' + diasActivos;
-    document.getElementById('timer-fin-label').textContent  = 'Día ' + diasActivos;
-
-  } else {
-    // ── Período cerrado ──
-    seleccionHabilitada = false;
-    countdownEl.style.display = 'none';
-    sliderRow.style.display   = 'none';
-    estadoEl.textContent = '🔒 ' + eventoNombre + ' — Período cerrado';
-    estadoEl.style.color = '#ef4444';
+  if(diff <= 0){
+    el.innerHTML = '<span class="timer-pasado">✅ ¡Hoy es el día!</span>';
+    return;
   }
 
-  if(eraHabilitada !== seleccionHabilitada) renderTabla();
+  var dias  = Math.floor(diff / 86400000);
+  var horas = Math.floor((diff % 86400000) / 3600000);
+  var mins  = Math.floor((diff % 3600000)  / 60000);
+  var segs  = Math.floor((diff % 60000)    / 1000);
+  var urgente = dias < 2;
+  var cls = urgente ? ' urgente' : '';
+
+  function blk(n, u){
+    return '<div class="timer-block'+cls+'"><span class="timer-n">'+String(n).padStart(2,'0')+'</span><span class="timer-u">'+u+'</span></div>';
+  }
+
+  var html = '';
+  if(dias > 0) html += blk(dias,'días') + '<span class="timer-sep">:</span>';
+  html += blk(horas,'hrs') + '<span class="timer-sep">:</span>';
+  html += blk(mins,'min') + '<span class="timer-sep">:</span>';
+  html += blk(segs,'seg');
+  el.innerHTML = html;
+
+  // Cambiar label si es urgente
+  var lbl = document.getElementById('timer-event-txt');
+  if(lbl) lbl.className = 'timer-event' + cls;
 }
 
 function abrirFechaModal(){
-  if(!esAdmin) return;
-  var inpFecha = document.getElementById('inp-fecha');
+  if(!esAdmin){ return; }
+  var inp = document.getElementById('inp-fecha');
   if(fechaInventario){
-    var iso = new Date(fechaInventario.getTime() - fechaInventario.getTimezoneOffset()*60000).toISOString().slice(0,16);
-    inpFecha.value = iso;
+    // Formatear para datetime-local (YYYY-MM-DDTHH:MM)
+    var iso = new Date(fechaInventario.getTime() - fechaInventario.getTimezoneOffset()*60000)
+               .toISOString().slice(0,16);
+    inp.value = iso;
   } else {
-    inpFecha.value = '';
+    inp.value = '';
   }
-  document.getElementById('inp-evento').value      = eventoNombre || '';
-  document.getElementById('inp-dias-activos').value = diasActivos;
+  document.getElementById('inp-evento').value = eventoNombre || '';
   document.getElementById('overlay-fecha').classList.add('open');
 }
 
 function guardarFechaInventario(){
-  var val    = document.getElementById('inp-fecha').value;
-  var nombre = document.getElementById('inp-evento').value.trim() || 'Próximo evento';
-  var da     = parseInt(document.getElementById('inp-dias-activos').value) || 10;
+  var val   = document.getElementById('inp-fecha').value;
+  var nombre = document.getElementById('inp-evento').value.trim() || 'Próximo inventario';
   if(!val){ toast('⚠️ Selecciona una fecha'); return; }
   var fecha = new Date(val);
   if(isNaN(fecha.getTime())){ toast('⚠️ Fecha inválida'); return; }
-  var updates = {};
-  updates['config/fechaInventario'] = { fecha: fecha.toISOString(), nombre: nombre };
-  updates['config/diasActivos']     = da;
-  db.ref().update(updates, function(err){
+  db.ref('config/fechaInventario').set({ fecha: fecha.toISOString(), nombre: nombre }, function(err){
     if(err){ toast('❌ Error al guardar'); return; }
-    toast('✅ Evento guardado');
+    toast('✅ Fecha guardada');
     document.getElementById('overlay-fecha').classList.remove('open');
   });
 }
 
 function borrarFechaInventario(){
   db.ref('config/fechaInventario').remove(function(){
-    toast('🗑️ Evento eliminado');
+    toast('🗑️ Cuenta regresiva eliminada');
     document.getElementById('overlay-fecha').classList.remove('open');
     if(timerInterval) clearInterval(timerInterval);
   });
