@@ -255,7 +255,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
 
     <!-- Preview del horario (público) -->
-    <div class="login-preview-card">
+    <div class="login-preview-card" id="login-calendario-card">
       <div class="login-preview-title">📅 Horario de esta semana</div>
       <div id="login-preview-wrap" style="overflow-x:auto">
         <div style="text-align:center;padding:18px;color:var(--muted);font-size:.8rem">Cargando horario…</div>
@@ -349,6 +349,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <button class="abtn red" onclick="borrarTodosHorarios()">🗑️ Borrar horarios</button>
       <button class="abtn yellow" onclick="nuevoMes()">🔄 Nuevo mes</button>
       <button class="abtn purple" onclick="toggleUsuarios()">👥 Gestionar usuarios</button>
+      <button class="abtn" id="btn-toggle-calendario" onclick="toggleCalendarioLogin()" style="background:#f0f9ff;color:#0369a1;border-color:#bae6fd">📅 Calendario inicio: ON</button>
     </div>
     <div id="panel-usuarios" style="display:none">
       <div class="users-list" id="users-list"></div>
@@ -372,8 +373,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <span id="timer-event-txt" class="timer-event">Próximo inventario</span>
       <button class="btn-timer-admin" id="btn-timer-admin" onclick="abrirFechaModal()" style="display:none">⚙ Configurar</button>
+      <button id="btn-abrir-evento" onclick="toggleEvento()" style="display:none;padding:4px 12px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s"></button>
     </div>
-    <div class="timer-digits" id="timer-digits"></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="timer-digits" id="timer-digits"></div>
+      <span id="evento-estado-txt" style="font-size:.7rem;font-weight:700;display:none"></span>
+    </div>
   </div>
 
   <div class="tip">💡 Elige modo → toca los turnos → confirma todos juntos.</div>
@@ -610,6 +615,15 @@ window.onload = function(){
   cargarPreviewLogin();
   iniciarLoginTimer();
 
+  // Escuchar si el admin oculta/muestra el calendario en pantalla de inicio
+  db.ref('config/mostrarCalendario').on('value', function(snap){
+    var val = snap.val();
+    calendarioLoginVisible = (val === null || val === true);
+    var card = document.getElementById('login-calendario-card');
+    if(card) card.style.display = calendarioLoginVisible ? 'block' : 'none';
+    actualizarBtnCalendario();
+  });
+
   // Escuchar presencia para la pantalla de inicio
   db.ref('presencia').on('value', function(snap){
     presencia = snap.val() || {};
@@ -683,15 +697,19 @@ function iniciarLoginTimer(){
   });
 }
 
+var _lpUsers = {}, _lpSched = {};
 function cargarPreviewLogin(){
-  Promise.all([
-    db.ref('usuarios').once('value'),
-    db.ref('horario').once('value')
-  ]).then(function(snaps){
-    var pu = snaps[0].val() || {};
-    var ps = snaps[1].val() || {};
-    renderLoginPreview(pu, ps);
-  }).catch(function(){
+  db.ref('usuarios').on('value', function(snap){
+    _lpUsers = snap.val() || {};
+    renderLoginPreview(_lpUsers, _lpSched);
+  }, function(){
+    document.getElementById('login-preview-wrap').innerHTML =
+      '<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem">—</div>';
+  });
+  db.ref('horario').on('value', function(snap){
+    _lpSched = snap.val() || {};
+    renderLoginPreview(_lpUsers, _lpSched);
+  }, function(){
     document.getElementById('login-preview-wrap').innerHTML =
       '<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem">—</div>';
   });
@@ -727,6 +745,9 @@ function renderLoginPreview(pu, ps){
           + '<div style="background:'+COLORS_BG[c]+';color:'+COLORS_TEXT[c]+';border-radius:4px;padding:2px 3px;font-weight:700;font-size:.6rem;white-space:nowrap">'
           + pu[uid].nombre.substring(0,5)
           + '</div></td>';
+      } else if(uid){
+        html += '<td style="padding:2px;border:1px solid var(--border);text-align:center">'
+          + '<div style="background:#fee2e2;color:#991b1b;border-radius:4px;padding:2px 3px;font-weight:700;font-size:.6rem">?</div></td>';
       } else {
         html += '<td style="border:1px solid var(--border)"></td>';
       }
@@ -1079,6 +1100,12 @@ function countSlots(uid){
 //  MODO
 // ══════════════════════════════════════
 function setModo(m){
+  if(m===modo){
+    var keys=Object.keys(selec);
+    if(keys.length>0) confirmarAccion();
+    else toast('Toca ＋ en los turnos de la tabla para seleccionarlos');
+    return;
+  }
   modo=m; selec={};
   document.getElementById('tab-reservar').className='modo-tab'+(m==='reservar'?' activo reservar':'');
   document.getElementById('tab-liberar').className='modo-tab'+(m==='liberar'?' activo liberar':'');
@@ -1528,6 +1555,7 @@ function toast(msg){
 var timerInterval = null;
 var fechaInventario = null;
 var eventoNombre = '';
+var eventoAbierto = false;
 
 function iniciarTimer(){
   // Botón oculto solo visible para admin
@@ -1626,6 +1654,33 @@ function borrarFechaInventario(){
     document.getElementById('overlay-fecha').classList.remove('open');
     if(timerInterval) clearInterval(timerInterval);
   });
+}
+
+// ══════════════════════════════════════
+//  CALENDARIO LOGIN TOGGLE
+// ══════════════════════════════════════
+var calendarioLoginVisible = true;
+
+function toggleCalendarioLogin(){
+  calendarioLoginVisible = !calendarioLoginVisible;
+  db.ref('config/mostrarCalendario').set(calendarioLoginVisible);
+  actualizarBtnCalendario();
+}
+
+function actualizarBtnCalendario(){
+  var btn = document.getElementById('btn-toggle-calendario');
+  if(!btn) return;
+  if(calendarioLoginVisible){
+    btn.textContent = '📅 Calendario inicio: ON';
+    btn.style.background = '#f0f9ff';
+    btn.style.color = '#0369a1';
+    btn.style.borderColor = '#bae6fd';
+  } else {
+    btn.textContent = '📅 Calendario inicio: OFF';
+    btn.style.background = '#fef2f2';
+    btn.style.color = '#991b1b';
+    btn.style.borderColor = '#fca5a5';
+  }
 }
 
 // ══════════════════════════════════════
