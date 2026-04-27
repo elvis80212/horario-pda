@@ -383,13 +383,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
   <div class="tip">💡 Elige modo → toca los turnos → confirma todos juntos.</div>
 
+  <!-- BANNER BLOQUEO (visible solo cuando timer aún no llegó a 0) -->
+  <div id="banner-bloqueo" style="display:none;align-items:center;gap:10px;background:#fef9c3;border:1.5px solid #fde047;border-radius:12px;padding:11px 16px;margin-bottom:14px;font-size:.82rem;font-weight:600;color:#713f12;">
+    <span style="font-size:1.2rem">🔒</span>
+    <span>Selección bloqueada — esperá que el timer llegue a cero para elegir tus turnos.</span>
+  </div>
+
   <!-- EN LÍNEA -->
   <div id="online-section" style="margin-bottom:14px"></div>
 
   <!-- MODO TABS -->
+  <div id="modo-tabs-wrap">
   <div class="modo-tabs">
     <button class="modo-tab activo reservar" id="tab-reservar" onclick="setModo('reservar')">✅ Reservar</button>
     <button class="modo-tab liberar" id="tab-liberar" onclick="setModo('liberar')">🗑️ Liberar</button>
+  </div>
   </div>
 
   <div class="slabel">Equipo</div>
@@ -1034,6 +1042,8 @@ function renderTabla(){
   diasKeys.forEach(function(dk){ head.innerHTML+='<div>'+getDayLabel(dk)+'</div>'; });
   body.innerHTML='';
 
+  var bloqueado = !seleccionAbierta && !esAdmin;
+
   SLOTS.forEach(function(slot,si){
     var row=document.createElement('div');
     row.className='t-row';
@@ -1044,6 +1054,19 @@ function renderTabla(){
       var key=dk+'-'+si;
       var t=sched[dk]&&sched[dk][si]!==undefined?sched[dk][si]:null;
       var isPending=selec[key]===true;
+
+      if(bloqueado){
+        // Turno ocupado → mostrar nombre igual (solo lectura)
+        if(t!==null&&t!==undefined){
+          var nombre=users[t]?users[t].nombre.substring(0,5):'?';
+          var bg=getBg(t),txt=getTxt(t),bdr=getBdr(t);
+          html+='<div class="cell"><button class="cbtn c-other" style="background:'+bg+';border-color:'+bdr+';color:'+txt+'">'+nombre+'</button></div>';
+        } else {
+          // Turno libre → candado
+          html+='<div class="cell"><button class="cbtn c-free" style="cursor:not-allowed;opacity:.5" disabled>🔒</button></div>';
+        }
+        return;
+      }
 
       if(isPending){
         var sc=getSelColor(me);
@@ -1118,6 +1141,7 @@ function setModo(m){
 //  SELECCIÓN
 // ══════════════════════════════════════
 function seleccionar(key,dk,si){
+  if(!seleccionAbierta && !esAdmin){ toast('🔒 Esperá que el timer llegue a cero'); return; }
   if(modo==='reservar'){
     var t=sched[dk]&&sched[dk][si]!==undefined?sched[dk][si]:null;
     if(t!==null){toast('⚠️ Turno ya ocupado');return;}
@@ -1127,6 +1151,8 @@ function seleccionar(key,dk,si){
 function deselec(key){ delete selec[key]; renderTabla(); updateFinBar(); }
 
 function updateFinBar(){
+  var bloqueado = !seleccionAbierta && !esAdmin;
+  if(bloqueado){ selec={}; document.getElementById('finbar').classList.remove('show'); return; }
   var keys=Object.keys(selec);
   document.getElementById('fin-count').textContent=keys.length;
   var bar=document.getElementById('finbar');
@@ -1556,6 +1582,7 @@ var timerInterval = null;
 var fechaInventario = null;
 var eventoNombre = '';
 var eventoAbierto = false;
+var seleccionAbierta = false; // true cuando el timer llegó a 0 y no hay nueva fecha futura
 
 function iniciarTimer(){
   // Botón oculto solo visible para admin
@@ -1573,8 +1600,15 @@ function iniciarTimer(){
       if(timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(tickTimer, 1000);
       tickTimer();
+      // Verificar estado actual inmediatamente
+      var ahora = new Date();
+      seleccionAbierta = (fechaInventario - ahora) <= 0;
+      actualizarBloqueo();
     } else {
       fechaInventario = null;
+      // Sin fecha configurada → bloqueado (esperando que admin configure)
+      seleccionAbierta = false;
+      actualizarBloqueo();
       document.getElementById('timer-bar').style.display = esAdmin ? 'flex' : 'none';
       if(!esAdmin){ if(timerInterval) clearInterval(timerInterval); return; }
       // Admin: mostrar barra vacía con botón para configurar
@@ -1583,6 +1617,33 @@ function iniciarTimer(){
         '<span style="font-size:.72rem;color:var(--muted)">Toca ⚙ para agregar</span>';
     }
   });
+}
+
+// ══════════════════════════════════════
+//  BLOQUEO / DESBLOQUEO DE SELECCIÓN
+// ══════════════════════════════════════
+function actualizarBloqueo(){
+  var bloqueado = !seleccionAbierta && !esAdmin;
+  var bannerEl  = document.getElementById('banner-bloqueo');
+  var tabsEl    = document.getElementById('modo-tabs-wrap');
+  var tipEl     = document.querySelector('.tip');
+
+  // Mostrar / ocultar banner
+  if(bannerEl){
+    bannerEl.style.display = bloqueado ? 'flex' : 'none';
+  }
+  // Opacidad de tabs
+  if(tabsEl){
+    tabsEl.style.opacity  = bloqueado ? '0.4' : '1';
+    tabsEl.style.pointerEvents = bloqueado ? 'none' : '';
+  }
+  // Tip
+  if(tipEl){
+    tipEl.style.display = bloqueado ? 'none' : '';
+  }
+  // Re-renderizar tabla para mostrar/ocultar candados
+  renderTabla();
+  updateFinBar();
 }
 
 function tickTimer(){
@@ -1594,7 +1655,18 @@ function tickTimer(){
 
   if(diff <= 0){
     el.innerHTML = '<span class="timer-pasado">✅ ¡Hoy es el día!</span>';
+    if(!seleccionAbierta){
+      seleccionAbierta = true;
+      actualizarBloqueo();
+      if(!esAdmin) toast('🎉 ¡Ya podés elegir tus turnos!');
+    }
     return;
+  }
+
+  // Mientras el timer corre → bloqueado
+  if(seleccionAbierta){
+    seleccionAbierta = false;
+    actualizarBloqueo();
   }
 
   var dias  = Math.floor(diff / 86400000);
