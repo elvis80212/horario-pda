@@ -735,6 +735,9 @@ function renderLoginPreview(pu, ps){
           + '<div style="background:'+COLORS_BG[c]+';color:'+COLORS_TEXT[c]+';border-radius:4px;padding:2px 3px;font-weight:700;font-size:.6rem;white-space:nowrap">'
           + pu[uid].nombre.substring(0,5)
           + '</div></td>';
+      } else if(uid){
+        html += '<td style="padding:2px;border:1px solid var(--border);text-align:center">'
+          + '<div style="background:#fee2e2;color:#991b1b;border-radius:4px;padding:2px 3px;font-weight:700;font-size:.6rem">?</div></td>';
       } else {
         html += '<td style="border:1px solid var(--border)"></td>';
       }
